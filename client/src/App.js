@@ -1,18 +1,29 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavbarHome, SideBar } from './components';
+import { Home, Wallet, Transaction, History } from './pages';
 
 function App() {
-  const [message, setMessage] = useState("");
-  
-  // Fetching message from backend on mount
-  useEffect(() => {
-    fetch(process.env.REACT_APP_SERVER_URL)
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message));
-  }, []);
+  const [message, setMessage] = useState('');
 
   return (
     <div className="App">
-      <h1>{message}</h1>
+      <BrowserRouter>
+        <NavbarHome />
+        <SideBar />
+        <div>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<Home />} />
+          </Routes>
+
+          <Routes>
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/send-tx" element={<Transaction />} />
+            <Route path="/history" element={<History />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </div>
   );
 }
