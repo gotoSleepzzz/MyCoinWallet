@@ -1,1 +1,0 @@
-import {ec} from 'elliptic';
