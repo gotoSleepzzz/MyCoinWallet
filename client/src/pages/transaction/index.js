@@ -1,7 +1,7 @@
-function Transaction() {
+function Transactions() {
     return (
         <div>TRANSACTION</div>
     );
 }
 
-export default Transaction;
+export default Transactions;

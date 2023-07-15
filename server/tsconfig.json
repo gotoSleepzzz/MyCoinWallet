@@ -108,10 +108,10 @@
   },
   "include": [
     "src/main.ts",
-    "src/blockchain.ts",
-    "src/p2p.ts",
-    "src/transaction.ts",
-    "src/util.ts",
-    "src/wallet.ts",
+    "src/models/blockchain.ts",
+    "src/utils/p2p.ts",
+    "src/models/transaction.ts",
+    "src/utils/util.ts",
+    "src/models/wallet.ts",
   ]
 }

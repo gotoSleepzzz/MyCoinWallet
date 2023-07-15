@@ -1,8 +1,9 @@
 import React from 'react'
+import './style.css'
 
 const WalletDashboard = () => {
   return (
-    <div>WalletDashboard</div>
+    <div className='dashboard'>WalletDashboardaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
   )
 }
 

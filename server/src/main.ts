@@ -8,7 +8,6 @@ const hostPort: number = parseInt(process.env.PORT as string, 10) || 8080;
 const options: cors.CorsOptions = {
   origin: process.env.CLIENT_URL as string,
 };
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());

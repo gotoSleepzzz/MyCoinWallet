@@ -22,7 +22,7 @@ function HomeHeader() {
             <Nav.Link href="#services">Services</Nav.Link>
             <Nav.Link href="#contact">Contact</Nav.Link>
           </Nav>
-          <Button variant="outline-primary">Sign In</Button>
+          <Button variant="outline-primary">My Products</Button>
         </Navbar.Collapse>
       </Navbar>
     </Container>
