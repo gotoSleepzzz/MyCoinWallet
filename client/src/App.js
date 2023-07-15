@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { NavbarHome, SideBar } from './components';
 import { Home, Wallet, Transaction, History } from './pages';
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { WalletAccess } from './components/wallet/access';
 import WalletCreate from './components/wallet/create';
 import AccessStatus from './components/layout/accessStatus';
@@ -17,8 +16,7 @@ function App() {
           <Route path="/wallet" element={<Navigate to="/wallet/access" />} />
           <Route path="/wallet/access" element={<WalletAccess />} />
           <Route path="/wallet/create" element={<WalletCreate />} />
-          <Route element={<><AccessStatus /><SideBar /></>} >
-            <Route element={<SideBar />} />
+          <Route element={<AccessStatus />} >
             <Route path="/wallet/dashboard" element={<WalletDashboard />} />
             <Route path="/send-tx" element={<Transaction />} />
             <Route path="/history" element={<History />} />
