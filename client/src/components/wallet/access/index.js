@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap'
 import "./style.css"
 import { Link } from 'react-router-dom'
+import AccessModal from './modal'
 
 export const WalletAccess = () => {
   const [show, setShow] = useState(false);
@@ -27,10 +28,9 @@ export const WalletAccess = () => {
                 <img src="https://via.placeholder.com/150" alt="Card Image" className="img-fluid" />
               </Col>
               <Col className='col-9'>
-                <Card.Title>My coin wallet</Card.Title>
+                <Card.Title>Software</Card.Title>
                 <Card.Text>
-                  Some quick example text to build on the card title and make up the
-                  bulk of the card's content.
+                  Keystore File, Mnemonic Phrase, and Private Key
                 </Card.Text>
               </Col>
             </Row>
@@ -39,23 +39,8 @@ export const WalletAccess = () => {
       </Container >
       <HomeFooter />
 
-      <Modal fullscreen={true} centered={true} show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Button variant="success" >Create a new wallet</Button>{' '}
+      <AccessModal show={show} handleClose={handleClose} />
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   )
 }
