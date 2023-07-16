@@ -29,13 +29,26 @@ class BlockChain {
         return this.chain[this.chain.length - 1];
     }
 
-    createTransaction(transaction: any): void {
-        this.pendingTransactions.push(transaction);
+    // TODO
+    createTransaction(from: string, to: string, amount: number, privateKey: string): void {
+        // this.pendingTransactions.push(transaction);
     }
 
     getBalance(address: string): number {
         let balance = 0;
         return balance;
+    }
+
+    // TODO
+    getTransactionFromWallet(address: string): any[] {
+        let history: any[] = [];
+        return history;
+    }
+
+    // TODO
+    getTransaction(from: string, to: string): any[] {
+        let transactions: any[] = [];
+        return transactions;
     }
 
     getDifficulty(): number {

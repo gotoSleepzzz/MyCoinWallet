@@ -4,6 +4,7 @@ import cors from 'cors';
 import { create } from 'domain';
 import { createWallet, createWalletUsingPassword, getWallet, getWalletFromPassword } from './models/wallet';
 import { get } from 'http';
+import { BlockChain } from './models/blockchain';
 require('dotenv').config();
 
 const hostPort: number = parseInt(process.env.PORT as string, 10) || 8080;
@@ -11,9 +12,13 @@ const hostPort: number = parseInt(process.env.PORT as string, 10) || 8080;
 const options: cors.CorsOptions = {
   origin: process.env.CLIENT_URL as string,
 };
+
+const blockChain = new BlockChain();
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Welcome to server!' });
 });
@@ -59,6 +64,62 @@ app.post('/api/v1/accessWallet', (req, res) => {
     } else {
       throw new Error('Invalid method');
     }
+    res.status(200).json({ message: 'Success' });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+// getBalance?address=0x1234567890
+app.get('/api/v1/getBalance', (req, res) => {
+  try {
+    const address = req.query.address;
+    if (address === undefined) {
+      throw new Error('Invalid address');
+    }
+    const balance = blockChain.getBalance(address as string);
+    res.status(200).json({ balance: balance });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/history', (req, res) => {
+  try {
+    const address = req.query.address;
+    if (address === undefined) {
+      throw new Error('Invalid address');
+    }
+    const history = blockChain.getTransactionFromWallet(address as string);
+    res.status(200).json({ history: history });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/transactions', (req, res) => {
+  try {
+    const from = req.query.from;
+    const to = req.query.to;
+    const transactions = blockChain.getTransaction(from as string, to as string);
+    res.status(200).json({ transactions: transactions });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.post('/api/v1/send-tx', (req, res) => {
+  try {
+    const from = req.body.from;
+    const to = req.body.to;
+    const amount = req.body.amount;
+    const privateKey = req.body.privateKey;
+    const tx = blockChain.createTransaction(from, to, amount, privateKey);
+    res.status(200).json({ tx: tx });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
