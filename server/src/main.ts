@@ -1,13 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { create } from 'domain';
 import { createWallet, createWalletUsingPassword, getWallet, getWalletFromPassword } from './models/wallet';
-import { get } from 'http';
+import http from 'http';
 import { BlockChain } from './models/blockchain';
+import { initP2PServer } from './utils/p2p';
 require('dotenv').config();
 
 const hostPort: number = parseInt(process.env.PORT as string, 10) || 8080;
+const p2pPort: number = parseInt(process.env.P2P_PORT as string, 10) || 6001;
 
 const options: cors.CorsOptions = {
   origin: process.env.CLIENT_URL as string,
@@ -129,3 +130,6 @@ app.post('/api/v1/send-tx', (req, res) => {
 app.listen(hostPort, () => {
   console.log('Server is listening on port ' + hostPort);
 });
+
+const server = http.createServer(app);
+initP2PServer(server, p2pPort);
