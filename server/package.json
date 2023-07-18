@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Blockchain101",
   "scripts": {
-    "start:dev": "npx nodemon"
+    "start:dev": "npx nodemon",
+    "start:dev1": "npx nodemon 8080",
+    "start:dev2": "npx nodemon 8085"
   },
   "keywords": [],
   "author": "az9thongnguyen",
@@ -19,19 +21,21 @@
     "http": "^0.0.1-security",
     "lodash": "^4.17.21",
     "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "@types/cors": "^2.8.13",
     "@types/crypto-js": "^4.1.1",
     "@types/elliptic": "^6.4.14",
     "@types/express": "^4.17.17",
     "@types/http-server": "^0.12.1",
     "@types/node": "^20.4.1",
+    "@types/socket.io": "^3.0.2",
     "@types/uuid": "^9.0.2",
     "@types/ws": "^8.5.5",
     "nodemon": "^3.0.0"

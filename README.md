@@ -1,16 +1,22 @@
 # MyCoinWallet
 Blockchain101
 
+## 1. Prepare socket environment
+```
+cd PeerNetwork
+npm install
+npm run start
+```
 
-## Run server app
+## 2. Run server app
 ```
 cd server
 npm install
-npm run start:dev
+npm run start:dev1
+npm run start:dev2
 ```
 
-
-## Run client
+## 3. Run client
 ```
 cd client
 npm install

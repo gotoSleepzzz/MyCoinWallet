@@ -6,6 +6,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+const peers = [];
+const socketId2PeerId = {};
+
 // Set up a route handler for the root URL
 app.get('/', (req, res) => {
   res.send('Socket server is running.');
@@ -29,35 +32,36 @@ app.get('/connections', (req, res) => {
     connectedClients.push(clientData);
   });
 
-  res.json(connectedClients);
+  res.json(socketId2PeerId);
 });
 
 // Socket.IO connection event handler
 io.on('connection', (socket) => {
-  console.log('A client has connected.');
-
-  // Handle 'message' events
-  socket.on('message', (data) => {
-    console.log('Received message:', data);
-
-    // Broadcast the received message to all connected clients
-    io.emit('message', data);
+  console.log('A user connected');
+  socket.on('newPeer', (peerHost) => {
+    if (peers.includes(peerHost) === false && peerHost) {
+      peers.push(peerHost);
+      socketId2PeerId[socket.id] = peerHost;
+      io.emit('addPeer', peers);
+      console.log(peers);
+    }
   });
 
   // Handle 'disconnect' events
   socket.on('disconnect', () => {
-    console.log('A client has disconnected.');
+    console.log('A user disconnected');
+    const p = socketId2PeerId[socket.id];
+    if (peers.indexOf(p) !== -1) {
+      peers.splice(peers.indexOf(p), 1);
+    }
+    delete socketId2PeerId[socket.id];
+    io.emit('removePeer', p);
+    console.log(peers);
   });
 });
 
-// Start the server
-const expressPort = 5000;
-app.listen(expressPort, () => {
-  console.log(`Express server is listening on port ${expressPort}`);
-});
-
 // Start the Socket.IO server
-const socketIOPort = 4000;
+const socketIOPort = 4040;
 server.listen(socketIOPort, () => {
   console.log(`Socket.IO server is listening on port ${socketIOPort}`);
 });

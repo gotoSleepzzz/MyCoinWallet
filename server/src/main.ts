@@ -7,11 +7,10 @@ import { BlockChain } from './models/blockchain';
 import { initP2PServer } from './utils/p2p';
 require('dotenv').config();
 
-const hostPort: number = parseInt(process.env.PORT as string, 10) || 8080;
-const p2pPort: number = parseInt(process.env.P2P_PORT as string, 10) || 6001;
+const hostPort: number = parseInt(process.argv.at(2) as string, 10) || parseInt(process.env.PORT as string, 10) || 8080;
 
 const options: cors.CorsOptions = {
-  origin: process.env.CLIENT_URL as string,
+  origin: '*',
 };
 
 const blockChain = new BlockChain();
@@ -127,9 +126,9 @@ app.post('/api/v1/send-tx', (req, res) => {
   }
 });
 
-app.listen(hostPort, () => {
+const server = http.createServer(app);
+initP2PServer(server, hostPort);
+
+server.listen(hostPort, () => {
   console.log('Server is listening on port ' + hostPort);
 });
-
-const server = http.createServer(app);
-initP2PServer(server, p2pPort);
