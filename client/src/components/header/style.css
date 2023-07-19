@@ -24,3 +24,20 @@
         transition: left 500ms ease-in-out;
     }
 }
+
+.main-title {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.menu-title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 800;
+    outline: 2px;
+    outline-color: aliceblue;
+}

@@ -13,6 +13,7 @@ class BlockChain {
     public chain: Block[];
     public difficulty: number;
     public pendingTransactions: any[];
+    public unspentTxOuts: any[];
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
@@ -35,9 +36,12 @@ class BlockChain {
     }
 
     getBalance(address: string): number {
-        let balance = 0;
-        return balance;
+        return this.findUnspentTxOuts(address).reduce((a, b) => a + b.amount, 0);
     }
+
+    findUnspentTxOuts(address: string) {
+        return this.unspentTxOuts.filter((uTxO: UnspentTxOut) => uTxO.address === address);
+    };
 
     // TODO
     getTransactionFromWallet(address: string): any[] {

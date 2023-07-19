@@ -1,26 +1,50 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Card, Row } from 'react-bootstrap'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
+import { ReactComponent as Spaceman } from './spaceman-and-dog.svg';
+import './style.css';
+
 function HomeMain() {
   const navigate = useNavigate();
 
-
   return (
-    <Card className="text-center mx-auto" style={{ width: '18rem' }}>
-      <Card.Body>
-        <Card.Title>My coin wallet</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
-        <Row>
-          <Button variant="success" onClick={() => navigate('/wallet/create')}>Create a new wallet</Button>{' '}
-          <Button variant="outline-success" onClick={() => navigate('/wallet/access')}>Access my wallet</Button>{' '}
-        </Row>
+    <Container fluid className="home">
+      <Row className="home-row">
+        <Col>
+          <Row className="justify-content-center">
+            <h1 className="text-center home-title">My coin wallet</h1>
+            <p className="text-center home-desc">
+              A simple wallet to manage your coins blockchain101.
+            </p>
+            <Row className="home-btn-container">
+              <Col className="home-btn">
+                <Button
+                  variant="success"
+                  onClick={() => navigate('/wallet/create')}
+                  className="home-btn-create"
+                >
+                  Create a new wallet
+                </Button>{' '}
+              </Col>
+              <Col>
+                <Button
+                  variant="info"
+                  onClick={() => navigate('/wallet/access')}
+                  className="home-btn-access"
 
-      </Card.Body>
-    </Card>
-  )
+                >
+                  Access my wallet
+                </Button>{' '}
+              </Col>
+            </Row>
+          </Row>
+        </Col>
+        <Col>
+          <Spaceman></Spaceman>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
-export default HomeMain
+export default HomeMain;
