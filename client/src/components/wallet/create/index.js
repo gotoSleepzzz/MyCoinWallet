@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import CreateModal from './modal';
 import './style.css';
 
+const methods = ['Private Key', 'Keystore File', 'Mnemonic Phrase'];
 
 const WalletCreate = () => {
   const [show, setShow] = useState(false);

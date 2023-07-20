@@ -3,7 +3,7 @@ import './style.css'
 
 const WalletDashboard = () => {
   return (
-    <div className='dashboard'>WalletDashboardaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
+    <div style={{width:'100%'}} className='dashboard'>WalletDashboardaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
   )
 }
 
