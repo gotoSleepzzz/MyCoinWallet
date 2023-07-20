@@ -10,7 +10,7 @@ import {
   Modal,
 } from 'react-bootstrap';
 import './style.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdOutlineContentCopy } from 'react-icons/md';
 import { IoMdCube } from 'react-icons/io';
 import { BiTransferAlt } from 'react-icons/bi';
@@ -20,6 +20,7 @@ import { BiLogOut } from 'react-icons/bi';
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -92,26 +93,26 @@ const Sidebar = () => {
       <Nav className="flex-column">
         <hr />
 
-        <a href="/blocks">
+        <a onClick={() => navigate('/blocks')}>
           <IoMdCube size={30} /> Blocks
         </a>
-        <a href="/transactions">
+        <a onClick={() => navigate('/transactions')}>
           <BiTransferAlt size={30} /> Transactions
         </a>
 
         <hr />
-        <a href="/wallet/send-tx">
+        <a onClick={() => navigate('/wallet/send-tx')}>
           <BsSend size={30} />
           Send-tx
         </a>
-        <a href="/wallet/history">
+        <a onClick={() => navigate('/wallet/history')}>
           {' '}
           <AiOutlineHistory size={30} />
           History
         </a>
 
         <hr />
-        <a href="/">
+        <a onClick={() => navigate('/')}>
           <BiLogOut size={30} />
           Logout
         </a>
