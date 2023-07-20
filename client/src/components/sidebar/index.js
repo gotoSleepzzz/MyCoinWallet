@@ -11,8 +11,12 @@ import {
 } from 'react-bootstrap';
 import './style.css';
 import { Link } from 'react-router-dom';
-
 import { MdOutlineContentCopy } from 'react-icons/md';
+import { IoMdCube } from 'react-icons/io';
+import { BiTransferAlt } from 'react-icons/bi';
+import { BsSend } from 'react-icons/bs';
+import { AiOutlineHistory } from 'react-icons/ai';
+import { BiLogOut } from 'react-icons/bi';
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -33,7 +37,7 @@ const Sidebar = () => {
           style={{
             position: 'relative',
             width: '100%',
-            height: '100%'
+            height: '100%',
           }}
         >
           <div
@@ -75,10 +79,10 @@ const Sidebar = () => {
               <h3 className="mt-3" style={{ fontWeight: '700' }}>
                 $0.00
               </h3>
-              <Row className='d-flex justify-content-center mt-5'>
+              <Row className="d-flex justify-content-center mt-5">
                 <Col>0 ETH</Col>
-                <Col className='d-flex flex-row-reverse'>
-                  <MdOutlineContentCopy role='button' />
+                <Col className="d-flex flex-row-reverse">
+                  <MdOutlineContentCopy role="button" />
                 </Col>
               </Row>
             </div>
@@ -87,13 +91,30 @@ const Sidebar = () => {
       </Row>
       <Nav className="flex-column">
         <hr />
-        <div href="/blocks">Blocks</div>
-        <div href="/transactions">Transactions</div>
+
+        <a href="/blocks">
+          <IoMdCube size={30} /> Blocks
+        </a>
+        <a href="/transactions">
+          <BiTransferAlt size={30} /> Transactions
+        </a>
+
         <hr />
-        <div href="/wallet/send-tx">Send-tx</div>
-        <div href="/wallet/history">History</div>
+        <a href="/wallet/send-tx">
+          <BsSend size={30} />
+          Send-tx
+        </a>
+        <a href="/wallet/history">
+          {' '}
+          <AiOutlineHistory size={30} />
+          History
+        </a>
+
         <hr />
-        <div href="/">Logout</div>
+        <a href="/">
+          <BiLogOut size={30} />
+          Logout
+        </a>
       </Nav>
     </Container>
   );
