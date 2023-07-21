@@ -9,7 +9,7 @@ function AccessStatus() {
   const { AccessStatus } = contex;
   return AccessStatus ? (
     <>
-      <Container fluid>
+      <Container fluid className='px-0'>
         <div
           style={{
             display: 'flex',
@@ -30,7 +30,7 @@ function AccessStatus() {
           >
             <Sidebar />
           </div>
-          <div style={{ display: 'flex', flex: '1 0 auto' ,width:'calc(100%)-300'}}>
+          <div style={{ display: 'flex', flex: '1 0 auto', width: 'calc(100%)-300' }}>
             <Outlet />
           </div>
         </div>

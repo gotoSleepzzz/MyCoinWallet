@@ -17,6 +17,7 @@ import { BiTransferAlt } from 'react-icons/bi';
 import { BsSend } from 'react-icons/bs';
 import { AiOutlineHistory } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
+import { FaLaptopCode } from 'react-icons/fa'
 
 const Sidebar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -28,12 +29,12 @@ const Sidebar = () => {
 
   return (
     <Container
-      style={{ backgroundColor: '#0D064F', color: '#fff', height: '100vh' }}
+      style={{ backgroundColor: '#0D064F', color: '#fff', height: '100vh', transform: 'translateX(0%)' }}
     >
       <Row className="justify-content-center">
-        <h3 style={{ fontWeight: '800' }}>My Coin Wallet</h3>
+        <h3 className='ml-3 my-3' style={{ fontWeight: '800' }}>My Coin Wallet</h3>
       </Row>
-      <Row className="justify-content-center">
+      <Row className="justify-content-center mb-3">
         <div
           style={{
             position: 'relative',
@@ -77,46 +78,79 @@ const Sidebar = () => {
               }}
             >
               0xb389b203801180f5ee112c7f7a6dbc3eec0c445c
-              <h3 className="mt-3" style={{ fontWeight: '700' }}>
+              <h3 className="mt-3 mb-5" style={{ fontWeight: '700' }}>
                 $0.00
               </h3>
-              <Row className="d-flex justify-content-center mt-5">
+              <Row className="d-flex justify-content-center">
                 <Col>0 ETH</Col>
                 <Col className="d-flex flex-row-reverse">
-                  <MdOutlineContentCopy role="button" />
+                  <MdOutlineContentCopy className='iconAnimation' role="button" />
                 </Col>
               </Row>
             </div>
           </div>
         </div>
       </Row>
-      <Nav className="flex-column">
-        <hr />
+      <div style={{
+        height: '50%',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        scrollbarWidth: 'none',
+        borderTop: '1px solid #fff',
 
-        <a onClick={() => navigate('/blocks')}>
-          <IoMdCube size={30} /> Blocks
+      }} className="flex-column justify-content-around pt-2 mb-5">
+        <a role='button' onClick={() => navigate('/wallet/dashboard')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <FaLaptopCode size={25} />
+            </Col>
+            <Col className='col-9'>Portfolio</Col>
+          </Row>
         </a>
-        <a onClick={() => navigate('/transactions')}>
-          <BiTransferAlt size={30} /> Transactions
-        </a>
-
         <hr />
-        <a onClick={() => navigate('/wallet/send-tx')}>
-          <BsSend size={30} />
-          Send-tx
+        <a role='button' onClick={() => navigate('/blocks')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <IoMdCube size={25} />
+            </Col>
+            <Col className='col-9'>Blocks</Col>
+          </Row>
         </a>
-        <a onClick={() => navigate('/wallet/history')}>
-          {' '}
-          <AiOutlineHistory size={30} />
-          History
+        <a role='button' onClick={() => navigate('/transactions')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <BiTransferAlt size={25} />
+            </Col>
+            <Col className='col-9'>Transactions</Col>
+          </Row>
         </a>
-
         <hr />
-        <a onClick={() => navigate('/')}>
-          <BiLogOut size={30} />
-          Logout
+        <a role='button' onClick={() => navigate('/wallet/send-tx')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <BsSend size={25} />
+            </Col>
+            <Col className='col-9'>Send-tx</Col>
+          </Row>
         </a>
-      </Nav>
+        <a role='button' onClick={() => navigate('/wallet/history')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <AiOutlineHistory size={25} />
+            </Col>
+            <Col className='col-9'>History</Col>
+          </Row>
+        </a>
+        <hr />
+        <a role='button' onClick={() => navigate('/')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <BiLogOut size={25} />
+            </Col>
+            <Col className='col-9'>Logout</Col>
+          </Row>
+        </a>
+      </div>
     </Container>
   );
 };

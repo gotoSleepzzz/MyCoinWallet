@@ -4,8 +4,9 @@ import React, { Fragment } from 'react';
 import { WalletAccess } from './components/wallet/access';
 import WalletCreate from './components/wallet/create';
 import AccessStatus from './components/layout/accessStatus';
-import WalletDashboard from './components/wallet/dashboard';
-import SendTx from 'components/wallet/sendtx';
+import WalletDashboard from './pages/wallet/dashboard';
+import SendTx from 'pages/wallet/sendtx';
+import Blocks from 'pages/block';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/wallet/send-tx" element={<SendTx />} />
             <Route path="/wallet/history" element={<History />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/blocks" element={<Blocks />} />
           </Route>
 
         </Routes>

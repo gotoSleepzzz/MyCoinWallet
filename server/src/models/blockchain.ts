@@ -1,6 +1,6 @@
 import * as CryptoJS from "crypto-js";
 import * as EC from "elliptic";
-import { Transaction } from "./transaction";
+import { Transaction, UnspentTxOut } from "./transaction";
 import { Block } from "./block";
 
 // in seconds
