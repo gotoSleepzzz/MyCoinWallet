@@ -6,7 +6,7 @@ import session from 'express-session';
 import { Wallet, createWallet, createWalletUsingPassword, getWallet, getWalletFromPassword } from './models/wallet';
 import http from 'http';
 import { BlockChain } from './models/blockchain';
-import { initP2PServer } from './utils/p2p';
+import { blockChain, initP2PServer } from './utils/p2p';
 import { getTransactionPool } from './utils/transactionPool';
 import { UnspentTxOut } from './models/transaction';
 import { Block } from './models/block';
@@ -23,8 +23,6 @@ const SHARE_MINING = true;
 const options: cors.CorsOptions = {
   origin: '*',
 };
-
-const blockChain = new BlockChain();
 
 const app = express();
 app.use(cors());
@@ -160,6 +158,9 @@ app.post('/api/v1/mineBlock', (req, res) => {
 
 app.post('/api/v1/accessWallet', (req, res) => {
   try {
+    if (OWNER.length > MAX_ACCESS) {
+      throw new Error('Reach max access');
+    }
     const method = req.body.method;
     let wallet: Wallet;
 

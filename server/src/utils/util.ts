@@ -7,4 +7,13 @@ const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
         && newBlock.timestamp - 60 < getCurrentTimestamp();
 };
 
-export { getCurrentTimestamp, isValidTimestamp };
+const JSONToObject = <T>(data: string): T => {
+    try {
+        return JSON.parse(data);
+    } catch (e) {
+        console.log(e);
+        return null as any;
+    }
+};
+
+export { getCurrentTimestamp, isValidTimestamp, JSONToObject };

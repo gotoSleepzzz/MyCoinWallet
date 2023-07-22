@@ -7,6 +7,7 @@ import { mine } from "../utils/miner";
 import { addToTransactionPool, getTransactionPool, updateTransactionPool } from "../utils/transactionPool";
 import _ from "lodash";
 import { Wallet, createTransaction, getPublickey } from "./wallet";
+import { broadcastLatest } from "../utils/p2p";
 
 // in seconds
 const BLOCK_GENERATION_INTERVAL: number = 10;
@@ -17,14 +18,12 @@ const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
 class BlockChain {
     public chain: Block[];
     public difficulty: number;
-    public pendingTransactions: any[];
     public unspentTxOuts: UnspentTxOut[];
     public io: any;
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
         this.difficulty = 4; // Adjust the difficulty as per your requirements
-        this.pendingTransactions = [];
         this.unspentTxOuts = [];
     }
 
@@ -156,6 +155,67 @@ class BlockChain {
         // broadcastTransactionPool();
         return tx;
     }
+
+    /*
+    Checks if the given blockchain is valid. Return the unspent txOuts if the chain is valid
+    */
+    isValidChain = (blockchainToValidate: Block[]): UnspentTxOut[] => {
+        console.log('isValidChain:');
+        console.log(JSON.stringify(blockchainToValidate));
+        const isValidGenesis = (block: Block): boolean => {
+            const genesisBlock: Block = this.createGenesisBlock();
+            return JSON.stringify(block) === JSON.stringify(genesisBlock);
+        };
+
+        if (!isValidGenesis(blockchainToValidate[0])) {
+            return null as any;
+        }
+        /*
+        Validate each block in the chain. The block is valid if the block structure is valid
+          and the transaction are valid
+         */
+        let aUnspentTxOuts: UnspentTxOut[] = [];
+
+        for (let i = 0; i < blockchainToValidate.length; i++) {
+            const currentBlock: Block = blockchainToValidate[i];
+            if (i !== 0 && !this.isValidNewBlock(blockchainToValidate[i], blockchainToValidate[i - 1])) {
+                return null as any;
+            }
+
+            aUnspentTxOuts = processTransactions(currentBlock.data, aUnspentTxOuts, currentBlock.index) as any;
+            if (aUnspentTxOuts === null) {
+                console.log('invalid transactions in blockchain');
+                return null as any;
+            }
+        }
+        return aUnspentTxOuts;
+    };
+
+    getAccumulatedDifficulty = (aBlockchain: Block[]): number => {
+        return aBlockchain
+            .map((block) => block.difficulty)
+            .map((difficulty) => Math.pow(2, difficulty))
+            .reduce((a, b) => a + b);
+    };
+
+    replaceChain = (newBlocks: Block[]) => {
+        const aUnspentTxOuts = this.isValidChain(newBlocks);
+        const validChain: boolean = aUnspentTxOuts !== null;
+        if (validChain &&
+            this.getAccumulatedDifficulty(newBlocks) > this.getAccumulatedDifficulty(this.getBlocks())) {
+            console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
+            this.chain = newBlocks;
+            this.setUnspentTxOuts(aUnspentTxOuts);
+            updateTransactionPool(this.unspentTxOuts);
+            broadcastLatest();
+        } else {
+            console.log('Received blockchain invalid');
+        }
+    };
+
+    handleReceivedTransaction = (transaction: Transaction) => {
+        addToTransactionPool(transaction, this.getUnspentTxOuts());
+    };
 }
 
 export { BlockChain };

@@ -1,9 +1,17 @@
 import { Server } from 'socket.io';
 import { io as IOClient, Socket } from 'socket.io-client';
+import { BlockChain } from '../models/blockchain';
+import { getTransactionPool } from './transactionPool';
+import { Block } from '../models/block';
+import { JSONToObject } from './util';
+import { Transaction } from '../models/transaction';
 
 const peers: Array<string> = [];
 
+const blockChain = new BlockChain();
+
 const Peer2Socket = new Map<string, Socket>();
+
 enum MessageType {
     QUERY_LATEST = 0,
     QUERY_ALL = 1,
@@ -27,6 +35,7 @@ const addPeer = (peer: string) => {
         console.log('connected to peer: ' + peer);
         Peer2Socket.set(peer, ioClient);
     });
+
     ioClient.on('disconnect', () => {
         console.log('disconnected from peer: ' + peer);
         Peer2Socket.delete(peer);
@@ -34,9 +43,48 @@ const addPeer = (peer: string) => {
             peers.splice(peers.indexOf(peer), 1);
         }
     });
+
     ioClient.on('message', (message: Message) => {
         console.log('received message: ' + JSON.stringify(message));
-        switch (message.type) {
+        try {
+            switch (message.type) {
+                case MessageType.QUERY_LATEST:
+                    write(ioClient, responseLatestMsg());
+                    break;
+                case MessageType.QUERY_ALL:
+                    write(ioClient, responseChainMsg());
+                    break;
+                case MessageType.RESPONSE_BLOCKCHAIN:
+                    const receivedBlocks: Block[] = JSONToObject<Block[]>(message.data);
+                    if (receivedBlocks === null) {
+                        console.log('invalid blocks received: %s', JSON.stringify(message.data));
+                        break;
+                    }
+                    handleBlockchainResponse(receivedBlocks);
+                    break;
+                case MessageType.QUERY_TRANSACTION_POOL:
+                    write(ioClient, responseTransactionPoolMsg());
+                    break;
+                case MessageType.RESPONSE_TRANSACTION_POOL:
+                    const receivedTransactions: Transaction[] = JSONToObject<Transaction[]>(message.data);
+                    if (receivedTransactions === null) {
+                        console.log('invalid transaction received: %s', JSON.stringify(message.data));
+                        break;
+                    }
+                    receivedTransactions.forEach((transaction: Transaction) => {
+                        try {
+                            blockChain.handleReceivedTransaction(transaction);
+                            // if no error is thrown, transaction was indeed added to the pool
+                            // let's broadcast transaction pool
+                            broadCastTransactionPool();
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    });
+                    break;
+            }
+        } catch (e) {
+            console.log(e);
         }
     });
 }
@@ -79,4 +127,74 @@ const initP2PServer = (httpServer: any, hostPort: number) => {
     ioPeer.emit('newPeer', `http://localhost:${hostPort}`);
 }
 
-export { initP2PServer };
+const write = (io: Socket, message: Message) => {
+    if (io === null || io === undefined) {
+        return;
+    }
+    io.send(JSON.stringify(message));
+};
+
+const broadcast = (message: Message) => peers.forEach((p) => write(Peer2Socket.get(p) as Socket, message));
+
+const queryChainLengthMsg = (): Message => ({ 'type': MessageType.QUERY_LATEST, 'data': null });
+
+const queryAllMsg = (): Message => ({ 'type': MessageType.QUERY_ALL, 'data': null });
+
+const responseChainMsg = (): Message => ({
+    'type': MessageType.RESPONSE_BLOCKCHAIN, 'data': JSON.stringify(blockChain.getBlocks())
+});
+
+const responseLatestMsg = (): Message => ({
+    'type': MessageType.RESPONSE_BLOCKCHAIN,
+    'data': JSON.stringify([blockChain.getLatestBlock()])
+});
+
+const queryTransactionPoolMsg = (): Message => ({
+    'type': MessageType.QUERY_TRANSACTION_POOL,
+    'data': null
+});
+
+const responseTransactionPoolMsg = (): Message => ({
+    'type': MessageType.RESPONSE_TRANSACTION_POOL,
+    'data': JSON.stringify(getTransactionPool())
+});
+
+const handleBlockchainResponse = (receivedBlocks: Block[]) => {
+    if (receivedBlocks.length === 0) {
+        console.log('received block chain size of 0');
+        return;
+    }
+    const latestBlockReceived: Block = receivedBlocks[receivedBlocks.length - 1];
+    if (!latestBlockReceived.isValidBlockStructure()) {
+        console.log('block structuture not valid');
+        return;
+    }
+    const latestBlockHeld: Block = blockChain.getLatestBlock();
+    if (latestBlockReceived.index > latestBlockHeld.index) {
+        console.log('blockchain possibly behind. We got: '
+            + latestBlockHeld.index + ' Peer got: ' + latestBlockReceived.index);
+        if (latestBlockHeld.hash === latestBlockReceived.previousHash) {
+            if (blockChain.addBlockToChain(latestBlockReceived)) {
+                broadcast(responseLatestMsg());
+            }
+        } else if (receivedBlocks.length === 1) {
+            console.log('We have to query the chain from our peer');
+            broadcast(queryAllMsg());
+        } else {
+            console.log('Received blockchain is longer than current blockchain');
+            blockChain.replaceChain(receivedBlocks);
+        }
+    } else {
+        console.log('received blockchain is not longer than received blockchain. Do nothing');
+    }
+};
+
+const broadcastLatest = (): void => {
+    broadcast(responseLatestMsg());
+};
+
+const broadCastTransactionPool = () => {
+    broadcast(responseTransactionPoolMsg());
+};
+
+export { initP2PServer, blockChain, broadcastLatest };
