@@ -83,4 +83,4 @@ const getWallet = (privateKey: string): Wallet => {
     return wallet;
 }
 
-export { Wallet, createWalletUsingPassword, createWallet, getWalletFromPassword, getWallet };
+export { Wallet, createWalletUsingPassword, createWallet, getWalletFromPassword, getWallet, getPublickey };

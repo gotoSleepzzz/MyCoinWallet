@@ -113,5 +113,7 @@
     "src/models/transaction.ts",
     "src/utils/util.ts",
     "src/models/wallet.ts",
+    "src/models/miner.ts",
+    "src/util/transactionPool.ts",
   ]
 }

@@ -23,6 +23,50 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Welcome to server!' });
 });
 
+app.get('/api/v1/blocks', (req, res) => {
+  try {
+    res.status(200).json({ blocks: blockChain.chain });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/block/:hash', (req, res) => {
+  try {
+    const hash = req.params.hash;
+    // const block = blockChain.getBlock(hash);
+    // res.status(200).json({ block: block });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/transactions', (req, res) => {
+  try {
+    const from = req.query.from;
+    const to = req.query.to;
+    const transactions = blockChain.getTransaction(from as string, to as string);
+    res.status(200).json({ transactions: transactions });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/transaction/:hash', (req, res) => {
+  try {
+    const hash = req.params.hash;
+    // const transaction = blockChain.getTransactionByHash(hash);
+    // res.status(200).json({ transaction: transaction });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+
 app.post('/api/v1/createWallet', (req, res) => {
   try {
     const method = req.body.method;
@@ -45,6 +89,53 @@ app.post('/api/v1/createWallet', (req, res) => {
     else {
       throw new Error('Invalid method');
     }
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/address/:address', (req, res) => {
+  try {
+    const address = req.params.address;
+    const wallet = getWallet(address);
+    res.status(200).json({ wallet: wallet });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.post('/api/v1/mineRawBlock', (req, res) => {
+  try {
+    const data = req.query.data;
+    // const block = blockChain.generateRawNextBlock(data as string);
+    // res.status(200).json({ block: block });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+
+  }
+});
+
+app.post('/api/v1/mineBlock', (req, res) => {
+  try {
+    const data = req.query.data;
+    // const block = blockChain.generateRawNextBlock(data as string);
+    // res.status(200).json({ block: block });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+
+  }
+});
+
+app.post('/mineTransaction', (req, res) => {
+  const address = req.body.address;
+  const amount = req.body.amount;
+  try {
+    // const resp = generatenextBlockWithTransaction(address, amount);
+    // res.send(resp);
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -86,6 +177,7 @@ app.get('/api/v1/getBalance', (req, res) => {
   }
 });
 
+// getHistory?address=0x1234567890
 app.get('/api/v1/history', (req, res) => {
   try {
     const address = req.query.address;
@@ -100,19 +192,7 @@ app.get('/api/v1/history', (req, res) => {
   }
 });
 
-app.get('/api/v1/transactions', (req, res) => {
-  try {
-    const from = req.query.from;
-    const to = req.query.to;
-    const transactions = blockChain.getTransaction(from as string, to as string);
-    res.status(200).json({ transactions: transactions });
-  } catch (e) {
-    console.log(e);
-    res.status(400).send(e);
-  }
-});
-
-app.post('/api/v1/send-tx', (req, res) => {
+app.post('/api/v1/sendTransaction', (req, res) => {
   try {
     const from = req.body.from;
     const to = req.body.to;
@@ -120,6 +200,20 @@ app.post('/api/v1/send-tx', (req, res) => {
     const privateKey = req.body.privateKey;
     const tx = blockChain.createTransaction(from, to, amount, privateKey);
     res.status(200).json({ tx: tx });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.post('/stop', (req, res) => {
+  res.send({ 'msg': 'stopping server' });
+  process.exit();
+});
+
+app.get('/api/v1/peers', (req, res) => {
+  try {
+    // res.status(200).json({ peers: getSockets().map((s: any) => s._socket.remoteAddress + ':' + s._socket.remotePort) });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);

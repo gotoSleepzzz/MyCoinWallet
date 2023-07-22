@@ -24,11 +24,13 @@ class Block {
     }
 
     calcHash(): string {
-        return CryptoJS.SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.difficulty + this.nonce).toString();
+        this.hash = CryptoJS.SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.difficulty + this.nonce).toString();
+        return this.hash;
     }
 
     calcHashWithNone(nonce: number): string {
-        return CryptoJS.SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.difficulty + nonce).toString();
+        this.hash = CryptoJS.SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.difficulty + nonce).toString();
+        return this.hash;
     }
 
     calcHashUpdateNonce(nonce: number): string {
@@ -36,15 +38,35 @@ class Block {
         return this.calcHash();
     }
 
-    hashMatchDifficult(hash: string, difficult: number) : boolean {
-        const difficultString = '0'.repeat(difficult);
-        return hash.startsWith(difficultString);
+    hashMatchDifficult(): boolean {
+        const difficultString = '0'.repeat(this.difficulty);
+        return this.hash.startsWith(difficultString);
     }
+
+    hashMatchesBlockContent = (): boolean => {
+        const blockHash: string = this.calcHash();
+        return blockHash === this.hash;
+    };
+
+    hasValidHash = (): boolean => {
+        if (!this.hashMatchesBlockContent()) {
+            console.log('invalid hash, got:' + this.hash);
+            return false;
+        }
+
+        if (!this.hashMatchDifficult()) {
+            console.log('block difficulty not satisfied. Expected: ' + this.difficulty + 'got: ' + this.hash);
+        }
+        return true;
+    };
+
+    isValidBlockStructure = (): boolean => {
+        return typeof this.index === 'number'
+            && typeof this.hash === 'string'
+            && typeof this.previousHash === 'string'
+            && typeof this.timestamp === 'number'
+            && typeof this.data === 'object';
+    };
 }
 
-const hashMatchesBlockContent = (block: Block): boolean => {
-    const blockHash: string = block.calcHash();
-    return blockHash === block.hash;
-};
-
-export { Block , hashMatchesBlockContent};
+export { Block };
