@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/v1/blocks', (req, res) => {
   try {
-    res.status(200).json({ blocks: blockChain.chain });
+    res.status(200).json({ blocks: 'block ne' });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -35,8 +35,7 @@ app.get('/api/v1/blocks', (req, res) => {
 app.get('/api/v1/block/:hash', (req, res) => {
   try {
     const hash = req.params.hash;
-    // const block = blockChain.getBlock(hash);
-    // res.status(200).json({ block: block });
+    res.status(200).json({ block: hash });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -59,7 +58,7 @@ app.get('/api/v1/transaction/:hash', (req, res) => {
   try {
     const hash = req.params.hash;
     // const transaction = blockChain.getTransactionByHash(hash);
-    // res.status(200).json({ transaction: transaction });
+    res.status(200).json({ transaction: hash });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -108,9 +107,8 @@ app.get('/api/v1/address/:address', (req, res) => {
 
 app.post('/api/v1/mineRawBlock', (req, res) => {
   try {
-    const data = req.query.data;
-    // const block = blockChain.generateRawNextBlock(data as string);
-    // res.status(200).json({ block: block });
+    const data = req.body.data;
+    res.status(200).json({ data });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -122,7 +120,7 @@ app.post('/api/v1/mineBlock', (req, res) => {
   try {
     const data = req.query.data;
     // const block = blockChain.generateRawNextBlock(data as string);
-    // res.status(200).json({ block: block });
+    res.status(200).json({ block: '11' });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -130,12 +128,13 @@ app.post('/api/v1/mineBlock', (req, res) => {
   }
 });
 
-app.post('/mineTransaction', (req, res) => {
-  const address = req.body.address;
+app.post('/api/v1/mineTransaction', (req, res) => {
+  const sender = req.body.sender;
+  const recipient = req.body.recipient;
   const amount = req.body.amount;
   try {
     // const resp = generatenextBlockWithTransaction(address, amount);
-    // res.send(resp);
+    res.status(200).json({ data: "1" });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -145,17 +144,18 @@ app.post('/mineTransaction', (req, res) => {
 app.post('/api/v1/accessWallet', (req, res) => {
   try {
     const method = req.body.method;
+    let wallet;
 
     if (method === 'usingPassword') {
-      const wallet = getWalletFromPassword(req.body.password, req.body.data);
+      wallet = getWalletFromPassword(req.body.password, req.body.data);
     } else if (method === 'usingMnemonic') {
       throw new Error('Unsupported method');
     } else if (method === 'usingPrivateKey') {
-      const wallet = getWallet(req.body.privateKey);
+      wallet = getWallet(req.body.privateKey);
     } else {
       throw new Error('Invalid method');
     }
-    res.status(200).json({ message: 'Success' });
+    res.status(200).json({ message: 'Success', wallet: wallet });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);

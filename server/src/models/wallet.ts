@@ -61,13 +61,15 @@ const createWalletUsingPassword = (password: string) => {
     const data = {
         address: wallet.address,
         passhash: CryptoJS.SHA256(password).toString(),
-        crypted: encryptPK(wallet.privateKey, password)
+        crypted: encryptPK(wallet.privateKey.substring(2,wallet.privateKey.length), password)
     }
     return data;
 }
 
 const createWallet = (): Wallet => {
-    return new Wallet();
+    const wallet = new Wallet();
+    wallet.createNew();
+    return wallet;
 }
 
 const getWalletFromPassword = (password: string, data: string): Wallet => {
