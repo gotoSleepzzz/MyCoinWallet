@@ -1,13 +1,24 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { createWallet, createWalletUsingPassword, getWallet, getWalletFromPassword } from './models/wallet';
+import _ from 'lodash';
+import session from 'express-session';
+import { Wallet, createWallet, createWalletUsingPassword, getWallet, getWalletFromPassword } from './models/wallet';
 import http from 'http';
 import { BlockChain } from './models/blockchain';
 import { initP2PServer } from './utils/p2p';
+import { getTransactionPool } from './utils/transactionPool';
+import { UnspentTxOut } from './models/transaction';
+import { Block } from './models/block';
 require('dotenv').config();
 
 const hostPort: number = parseInt(process.argv.at(2) as string, 10) || parseInt(process.env.PORT as string, 10) || 8080;
+
+const OWNER: Array<Wallet> = [];
+
+const MAX_ACCESS = 5;
+
+const SHARE_MINING = true;
 
 const options: cors.CorsOptions = {
   origin: '*',
@@ -25,7 +36,8 @@ app.get('/', (req, res) => {
 
 app.get('/api/v1/blocks', (req, res) => {
   try {
-    res.status(200).json({ blocks: 'block ne' });
+    const blocks = blockChain.getBlocks();
+    res.status(200).json({ blocks: blocks });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -35,7 +47,8 @@ app.get('/api/v1/blocks', (req, res) => {
 app.get('/api/v1/block/:hash', (req, res) => {
   try {
     const hash = req.params.hash;
-    res.status(200).json({ block: hash });
+    const block = _.find(blockChain.getBlocks(), { 'hash': req.params.hash });
+    res.status(200).json({ block: block });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -44,9 +57,7 @@ app.get('/api/v1/block/:hash', (req, res) => {
 
 app.get('/api/v1/transactions', (req, res) => {
   try {
-    const from = req.query.from;
-    const to = req.query.to;
-    const transactions = blockChain.getTransaction(from as string, to as string);
+    const transactions = getTransactionPool();
     res.status(200).json({ transactions: transactions });
   } catch (e) {
     console.log(e);
@@ -56,15 +67,16 @@ app.get('/api/v1/transactions', (req, res) => {
 
 app.get('/api/v1/transaction/:hash', (req, res) => {
   try {
-    const hash = req.params.hash;
-    // const transaction = blockChain.getTransactionByHash(hash);
-    res.status(200).json({ transaction: hash });
+    const tx = _(blockChain.getBlocks())
+      .map((blocks) => blocks.data)
+      .flatten()
+      .find({ 'id': req.params.hash });
+    res.status(200).json({ transaction: tx });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
   }
 });
-
 
 app.post('/api/v1/createWallet', (req, res) => {
   try {
@@ -96,9 +108,19 @@ app.post('/api/v1/createWallet', (req, res) => {
 
 app.get('/api/v1/address/:address', (req, res) => {
   try {
-    const address = req.params.address;
-    const wallet = getWallet(address);
-    res.status(200).json({ wallet: wallet });
+    const unspentTxOuts: UnspentTxOut[] =
+      _.filter(blockChain.getUnspentTxOuts(), (uTxO) => uTxO.address === req.params.address);
+    res.status(200).json({ 'unspentTxOuts': unspentTxOuts });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/address', (req, res) => {
+  try {
+    const unspentTxOuts: UnspentTxOut[] = blockChain.getUnspentTxOuts();
+    res.status(200).json({ 'unspentTxOuts': unspentTxOuts });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -107,44 +129,39 @@ app.get('/api/v1/address/:address', (req, res) => {
 
 app.post('/api/v1/mineRawBlock', (req, res) => {
   try {
-    const data = req.body.data;
-    res.status(200).json({ data });
+    if (req.body.data == null) {
+      throw Error('data parameter is missing');
+    }
+    const newBlock: Block = blockChain.generateRawNextBlock(req.body.data) as Block;
+    if (newBlock === null) {
+      throw Error('could not generate block');
+    }
+    res.status(200).json({ block: newBlock });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
-
   }
 });
 
 app.post('/api/v1/mineBlock', (req, res) => {
   try {
-    const data = req.query.data;
-    // const block = blockChain.generateRawNextBlock(data as string);
-    res.status(200).json({ block: '11' });
+    const wallet = OWNER.find((w) => w.address === req.body.address);
+    if (wallet === undefined) {
+      throw new Error('Invalid address');
+    }
+    const block = blockChain.generateNextBlock(wallet.address);
+    res.status(200).json({ block: block });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
 
-  }
-});
-
-app.post('/api/v1/mineTransaction', (req, res) => {
-  const sender = req.body.sender;
-  const recipient = req.body.recipient;
-  const amount = req.body.amount;
-  try {
-    // const resp = generatenextBlockWithTransaction(address, amount);
-    res.status(200).json({ data: "1" });
-  } catch (e) {
-    console.log(e);
-    res.status(400).send(e);
   }
 });
 
 app.post('/api/v1/accessWallet', (req, res) => {
   try {
     const method = req.body.method;
-    let wallet;
+    let wallet: Wallet;
 
     if (method === 'usingPassword') {
       wallet = getWalletFromPassword(req.body.password, req.body.data);
@@ -155,6 +172,7 @@ app.post('/api/v1/accessWallet', (req, res) => {
     } else {
       throw new Error('Invalid method');
     }
+    OWNER.push(wallet);
     res.status(200).json({ message: 'Success', wallet: wallet });
   } catch (e) {
     console.log(e);
@@ -184,8 +202,28 @@ app.get('/api/v1/history', (req, res) => {
     if (address === undefined) {
       throw new Error('Invalid address');
     }
-    const history = blockChain.getTransactionFromWallet(address as string);
-    res.status(200).json({ history: history });
+    // const history = blockChain.getTransactionFromWallet(address as string);
+    // res.status(200).json({ history: history });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.post('/api/v1/mineTransaction', (req, res) => {
+  const sender = req.body.sender;
+  const recipient = req.body.recipient;
+  const amount = req.body.amount;
+  try {
+    if (sender === undefined || recipient === undefined || amount === undefined) {
+      throw new Error('Invalid parameters');
+    }
+    const idx = OWNER.find((w) => w.address === sender);
+    if (idx === undefined) {
+      throw new Error('Invalid sender');
+    }
+    const resp = blockChain.generateNextBlockWithTransaction(idx, recipient, amount);
+    res.status(200).send(resp);
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -194,12 +232,20 @@ app.get('/api/v1/history', (req, res) => {
 
 app.post('/api/v1/sendTransaction', (req, res) => {
   try {
-    const from = req.body.from;
-    const to = req.body.to;
+    const sender = req.body.sender;
+    const recipient = req.body.recipient;
     const amount = req.body.amount;
-    const privateKey = req.body.privateKey;
-    const tx = blockChain.createTransaction(from, to, amount, privateKey);
-    res.status(200).json({ tx: tx });
+
+    if (sender === undefined || recipient === undefined || amount === undefined) {
+      throw new Error('Invalid parameters');
+    }
+
+    const ownWallet = OWNER.find((w) => w.address === sender);
+    if (ownWallet === undefined) {
+      throw new Error('Invalid sender');
+    }
+    const resp = blockChain.sendTransaction(ownWallet, recipient, amount);
+    res.status(200).send(resp);
   } catch (e) {
     console.log(e);
     res.status(400).send(e);

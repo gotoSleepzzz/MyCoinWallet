@@ -1,11 +1,12 @@
 import * as CryptoJS from "crypto-js";
 import * as EC from "elliptic";
-import { Transaction, UnspentTxOut, processTransactions } from "./transaction";
+import { Transaction, UnspentTxOut, getCoinbaseTransaction, isValidAddress, processTransactions } from "./transaction";
 import { Block } from "./block";
 import { getCurrentTimestamp, isValidTimestamp } from "../utils/util";
 import { mine } from "../utils/miner";
-import { updateTransactionPool } from "../utils/transactionPool";
+import { addToTransactionPool, getTransactionPool, updateTransactionPool } from "../utils/transactionPool";
 import _ from "lodash";
+import { Wallet, createTransaction, getPublickey } from "./wallet";
 
 // in seconds
 const BLOCK_GENERATION_INTERVAL: number = 10;
@@ -17,26 +18,28 @@ class BlockChain {
     public chain: Block[];
     public difficulty: number;
     public pendingTransactions: any[];
-    public unspentTxOuts: any[];
+    public unspentTxOuts: UnspentTxOut[];
+    public io: any;
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
         this.difficulty = 4; // Adjust the difficulty as per your requirements
         this.pendingTransactions = [];
+        this.unspentTxOuts = [];
     }
+
     createGenesisBlock(): Block {
         return new Block(
-            0, '91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627', '', 1465154705, [], 0, 0
+            0, '89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3', '', 1465154705, [], 0, 0
         );
+    }
+
+    getBlocks(): Block[] {
+        return this.chain;
     }
 
     getLatestBlock(): Block {
         return this.chain[this.chain.length - 1];
-    }
-
-    // TODO
-    createTransaction(from: string, to: string, amount: number, privateKey: string): void {
-        // this.pendingTransactions.push(transaction);
     }
 
     getBalance(address: string): number {
@@ -46,18 +49,6 @@ class BlockChain {
     findUnspentTxOuts(address: string) {
         return this.unspentTxOuts.filter((uTxO: UnspentTxOut) => uTxO.address === address);
     };
-
-    // TODO
-    getTransactionFromWallet(address: string): any[] {
-        let history: any[] = [];
-        return history;
-    }
-
-    // TODO
-    getTransaction(from: string, to: string): any[] {
-        let transactions: any[] = [];
-        return transactions;
-    }
 
     getDifficulty(): number {
         const latestBlock: Block = this.chain[this.chain.length - 1];
@@ -137,8 +128,34 @@ class BlockChain {
         } else {
             return null;
         }
-
     };
+
+    generateNextBlock = (address: string) => {
+        // TODO: private key
+        const coinbaseTx: Transaction = getCoinbaseTransaction(address, this.getLatestBlock().index + 1);
+        const blockData: Transaction[] = [coinbaseTx].concat(getTransactionPool());
+        return this.generateRawNextBlock(blockData);
+    }
+
+    generateNextBlockWithTransaction = (sender: Wallet, recipientAddress: string, amount: number) => {
+        if (!isValidAddress(recipientAddress)) {
+            throw Error('invalid address');
+        }
+        if (typeof amount !== 'number') {
+            throw Error('invalid amount');
+        }
+        const coinbaseTx: Transaction = getCoinbaseTransaction(sender.address, this.getLatestBlock().index + 1);
+        const tx: Transaction = createTransaction(recipientAddress, amount, sender.privateKey, this.getUnspentTxOuts(), getTransactionPool());
+        const blockData: Transaction[] = [coinbaseTx, tx];
+        return this.generateRawNextBlock(blockData);
+    }
+
+    sendTransaction = (sender: Wallet, recipient: string, amount: number) => {
+        const tx: Transaction = createTransaction(recipient, amount, sender.privateKey, this.getUnspentTxOuts(), getTransactionPool());
+        addToTransactionPool(tx, this.getUnspentTxOuts());
+        // broadcastTransactionPool();
+        return tx;
+    }
 }
 
 export { BlockChain };

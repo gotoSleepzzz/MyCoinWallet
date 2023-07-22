@@ -4,9 +4,7 @@ import { io as IOClient, Socket } from 'socket.io-client';
 const peers: Array<string> = [];
 
 const Peer2Socket = new Map<string, Socket>();
-const
-
-    enum MessageType {
+enum MessageType {
     QUERY_LATEST = 0,
     QUERY_ALL = 1,
     RESPONSE_BLOCKCHAIN = 2,
@@ -42,7 +40,7 @@ const addPeer = (peer: string) => {
         }
     });
 }
-var temp: any;
+
 const initP2PServer = (httpServer: any, hostPort: number) => {
     const SelfUrl = `http://localhost:${hostPort}`;
     const io = new Server(httpServer);

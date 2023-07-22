@@ -30,19 +30,21 @@ http://localhost:3000
 
 # TODO:
 - client
-    - create wallet
-    - access my wallet
+    - done : home
+    - done : create wallet
+    - done : access my wallet
     - view wallet
     - send coin
     - view history (https://etherscan.io/)
 
 - server
-    - create blockchain
-    - create transaction
-    - create wallet
-    - access wallet
-    - view history
-    - make transaction
+    - done : create blockchain
+    - done : create transaction
+    - done : create wallet
+    - done : access wallet
+    - done : view history
+    - done : make transaction
+    - p2p network
 
 ### Reference
 - https://github.com/anders94/blockchain-demo

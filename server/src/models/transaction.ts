@@ -5,6 +5,8 @@ import { getPublickey } from './wallet';
 
 const ec = new ecdsa.ec('secp256k1');
 
+const COINBASE_AMOUNT: number = 50;
+
 class UnspentTxOut {
     public readonly txOutId: string;
     public readonly txOutIndex: number;
@@ -28,6 +30,11 @@ class TxIn {
 class TxOut {
     public address: string;
     public amount: number;
+
+    constructor(address: string, amount: number) {
+        this.address = address;
+        this.amount = amount;
+    }
 }
 
 class Transaction {
@@ -301,4 +308,17 @@ const findUnspentTxOut = (transactionId: string, index: number, aUnspentTxOuts: 
     return aUnspentTxOuts.find((uTxO) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index) as UnspentTxOut;
 };
 
-export { UnspentTxOut, TxIn, TxOut, Transaction, processTransactions, getTxInAmount, findUnspentTxOut };
+const getCoinbaseTransaction = (address: string, blockIndex: number): Transaction => {
+    const t = new Transaction();
+    const txIn: TxIn = new TxIn();
+    txIn.signature = '';
+    txIn.txOutId = '';
+    txIn.txOutIndex = blockIndex;
+
+    t.txIns = [txIn];
+    t.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
+    t.id = t.getTransactionId();
+    return t;
+};
+
+export { UnspentTxOut, TxIn, TxOut, Transaction, processTransactions, getTxInAmount, findUnspentTxOut, getCoinbaseTransaction, isValidAddress };
