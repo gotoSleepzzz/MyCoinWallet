@@ -21,6 +21,8 @@ class Block {
 
         this.data = data;
         this.timestamp = timestamp;
+        this.difficulty = difficulty;
+        this.nonce = nonce;
     }
 
     calcHash(): string {

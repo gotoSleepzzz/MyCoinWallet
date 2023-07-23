@@ -14,15 +14,15 @@ function AccessStatus() {
           style={{
             display: 'flex',
             height: '100%',
-            width: '100%',
+            maxWidth: '100%',
             margin: 'auto',
           }}
         >
           <div
             style={{
               backgroundColor: '#ff8888',
-              height: '95vh',
-              width: '300px',
+              height: '100vh',
+              maxWidth: '250px',
               position: 'sticky',
               top: '0',
               left: '0',
@@ -30,7 +30,7 @@ function AccessStatus() {
           >
             <Sidebar />
           </div>
-          <div style={{ display: 'flex', flex: '1 0 auto', maxWidth: 'calc(100%)-300px' }}>
+          <div style={{ display: 'flex', flex: '1 0 auto', maxWidth: 'calc(100vw-250px)', backgroundColor: 'wheat' }}>
             <Outlet />
           </div>
         </div>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { BASE_URL } from 'constants/const';
 
 const getBlocksService = () => {
-    return axios.get(`${BASE_URL}/blocks`)
+    return axios.get(`${BASE_URL}/block`)
         .then(res => res.data)
         .catch(err => console.log(err))
 }
@@ -12,3 +12,5 @@ const getBlockService = (blockHash) => {
         .then(res => res.data)
         .catch(err => console.log(err))
 }
+
+export { getBlocksService, getBlockService };

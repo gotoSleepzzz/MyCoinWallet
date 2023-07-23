@@ -123,6 +123,7 @@ function KeystoreAccess(props) {
                   setWalletInfo({
                     publicKey: res.wallet.address,
                     privateKey: res.wallet.privateKey,
+                    balance: res.wallet.balance,
                   });
                   navigate('/wallet/dashboard');
                 }).catch((err) => {

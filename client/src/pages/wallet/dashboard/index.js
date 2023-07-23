@@ -10,8 +10,8 @@ const WalletDashboard = () => {
 
 
   return (
-    <Container fluid className='dashboard d-flex pt-5 justify-content-around'>
-      <Row>
+    <Container fluid className='dashboard d-flex pt-5 justify-content-around' style={{maxWidth:'100%'}}>
+      <Col className='col-8'>
         <Card style={{ maxWidth: '30rem', maxHeight: '12rem' }} className='d-flex col-auto' >
           <Card.Header style={{ color: 'green' }}>
             <h3>Address</h3>
@@ -22,19 +22,19 @@ const WalletDashboard = () => {
             </Card.Text>
           </Card.Body>
         </Card>
-      </Row>
-      <Row>
+      </Col>
+      <Col className='col-4'>
         <Card style={{ maxWidth: '15rem', maxHeight: '12rem' }} className='d-flex col-auto' >
           <Card.Header style={{ color: 'blue', }}>
             <h3>Balance</h3>
           </Card.Header>
           <Card.Body>
             <Card.Text className='break-words' style={{ fontWeight: 'bold' }}>
-              1000
+              {WalletInfo.balance}
             </Card.Text>
           </Card.Body>
         </Card>
-      </Row>
+      </Col>
     </Container>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Container,
   Row,
@@ -19,6 +19,7 @@ import { AiOutlineHistory } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
 import { FaLaptopCode } from 'react-icons/fa'
 import { AppContext } from 'Context';
+import { getBalanceService } from 'api/wallet';
 
 const Sidebar = () => {
   const context = useContext(AppContext);
@@ -29,6 +30,15 @@ const Sidebar = () => {
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
+  useEffect(() => {
+    getBalanceService(WalletInfo.publicKey).then((res) => {
+      setWalletInfo({
+        ...WalletInfo,
+        balance: res.balance,
+      });
+    }).catch(err => console.log(err));
+  }, []);
 
   return (
     <Container
@@ -64,7 +74,7 @@ const Sidebar = () => {
                 overflow: 'clip',
                 zIndex: '1',
               }}
-              src={`https://mewcard.mewapi.io/?address=${WalletInfo.publicKey.slice(0,42)}`}
+              src={`https://mewcard.mewapi.io/?address=${WalletInfo.publicKey.slice(0, 42)}`}
             />
             <div
               style={{
@@ -81,11 +91,10 @@ const Sidebar = () => {
               }}
             >
               {WalletInfo.publicKey}
-              <h3 className="mt-3 mb-5" style={{ fontWeight: '700' }}>
-                $0.00
+              <h3 className="mt-3 mb-3" style={{ fontWeight: '700' }}>
+              {WalletInfo.balance}
               </h3>
               <Row className="d-flex justify-content-center">
-                <Col>0 ETH</Col>
                 <Col className="d-flex flex-row-reverse">
                   <MdOutlineContentCopy className='iconAnimation' role="button" onClick={() => {
                     navigator.clipboard.writeText(WalletInfo.publicKey);
@@ -113,7 +122,7 @@ const Sidebar = () => {
           </Row>
         </a>
         <hr />
-        <a role='button' onClick={() => navigate('/blocks')} className='sideBarMenu-item'>
+        <a role='button' onClick={() => navigate('/block')} className='sideBarMenu-item'>
           <Row className='mx-auto my-3'>
             <Col className='col-2'>
               <IoMdCube size={25} />
@@ -121,7 +130,7 @@ const Sidebar = () => {
             <Col className='col-9'>Blocks</Col>
           </Row>
         </a>
-        <a role='button' onClick={() => navigate('/transactions')} className='sideBarMenu-item'>
+        <a role='button' onClick={() => navigate('/transaction')} className='sideBarMenu-item'>
           <Row className='mx-auto my-3'>
             <Col className='col-2'>
               <BiTransferAlt size={25} />

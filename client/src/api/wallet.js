@@ -21,13 +21,23 @@ const createWalletService = (method, password) => {
     return dataPromise;
 }
 
-const sendTransactionService = async () => {
+const sendTransactionService = async (sender, recipient, amount) => {
+    const promise = axios.post(`${BASE_URL}/sendTransaction`, {
+        sender: sender,
+        recipient: recipient,
+        amount: amount,
+    });
+    const dataPromise = promise.then((res) => res.data);
+    return dataPromise;
 }
 
-const getHistoryService = async () => {
+const getHistoryService = async (address) => {
 }
 
-const getBalanceService = async () => {
+const getBalanceService = async (address) => {
+    const promise = axios.get(`${BASE_URL}/getBalance?address=${address}`);
+    const dataPromise = promise.then((res) => res.data);
+    return dataPromise;
 }
 
 export { accessWalletService, createWalletService, sendTransactionService, getHistoryService, getBalanceService };

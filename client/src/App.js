@@ -7,6 +7,8 @@ import AccessStatus from './components/layout/accessStatus';
 import WalletDashboard from './pages/wallet/dashboard';
 import SendTx from 'pages/wallet/sendtx';
 import Blocks from 'pages/block';
+import TransactionWithHash from 'pages/transaction/hash';
+import BlockWithHash from 'pages/block/hash';
 
 function App() {
 
@@ -22,8 +24,11 @@ function App() {
             <Route path="/wallet/dashboard" element={<WalletDashboard />} />
             <Route path="/wallet/send-tx" element={<SendTx />} />
             <Route path="/wallet/history" element={<History />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/blocks" element={<Blocks />} />
+            <Route path="/transaction" element={<Transactions />} />
+            <Route path="transaction/:hash" element={<TransactionWithHash />} />
+            <Route path="/transaction/:hash" element={<TransactionWithHash />} />
+            <Route path="/block" element={<Blocks />} />
+            <Route path="/block/:hash" element={<BlockWithHash />} />
           </Route>
 
         </Routes>

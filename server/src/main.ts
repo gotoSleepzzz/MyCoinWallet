@@ -16,7 +16,7 @@ const hostPort: number = parseInt(process.argv.at(2) as string, 10) || parseInt(
 
 const OWNER: Array<Wallet> = [];
 
-const MAX_ACCESS = 5;
+const MAX_ACCESS = 500;
 
 const SHARE_MINING = true;
 
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Welcome to server!' });
 });
 
-app.get('/api/v1/blocks', (req, res) => {
+app.get('/api/v1/block', (req, res) => {
   try {
     const blocks = blockChain.getBlocks();
     res.status(200).json({ blocks: blocks });
@@ -53,7 +53,7 @@ app.get('/api/v1/block/:hash', (req, res) => {
   }
 });
 
-app.get('/api/v1/transactions', (req, res) => {
+app.get('/api/v1/transaction', (req, res) => {
   try {
     const transactions = getTransactionPool();
     res.status(200).json({ transactions: transactions });
@@ -85,15 +85,23 @@ app.post('/api/v1/createWallet', (req, res) => {
       if (password === undefined || password.length < 8) {
         throw new Error('Invalid password');
       }
-      const data = createWalletUsingPassword(password);
+      const {data,wallet} = createWalletUsingPassword(password);
+      // to test + demo
+      const block = blockChain.generateNextBlock(wallet.address);
+      //
+      OWNER.push(wallet);
       res.status(200).json(data);
     }
     else if (method === 'usingMnemonic') {
       throw new Error('Unsupported method');
     }
     else if (method === 'usingPrivateKey') {
-      const data = createWallet();
-      res.status(200).json(data);
+      const wallet = createWallet();
+      // to test demo
+      const block = blockChain.generateNextBlock(wallet.address);
+      //
+      OWNER.push(wallet);
+      res.status(200).json(wallet);
     }
     else {
       throw new Error('Invalid method');
@@ -166,15 +174,16 @@ app.post('/api/v1/accessWallet', (req, res) => {
 
     if (method === 'usingPassword') {
       wallet = getWalletFromPassword(req.body.password, req.body.data);
+      OWNER.push(wallet);
     } else if (method === 'usingMnemonic') {
       throw new Error('Unsupported method');
     } else if (method === 'usingPrivateKey') {
       wallet = getWallet(req.body.privateKey);
+      OWNER.push(wallet);
     } else {
       console.log(method);
       throw new Error('Invalid method');
     }
-    OWNER.push(wallet);
     res.status(200).json({ message: 'Success', wallet: wallet });
   } catch (e) {
     console.log(e);
@@ -241,7 +250,7 @@ app.post('/api/v1/sendTransaction', (req, res) => {
     if (sender === undefined || recipient === undefined || amount === undefined) {
       throw new Error('Invalid parameters');
     }
-
+    console.log(OWNER);
     const ownWallet = OWNER.find((w) => w.address === sender);
     if (ownWallet === undefined) {
       throw new Error('Invalid sender');

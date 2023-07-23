@@ -7,7 +7,7 @@ import { mine } from "../utils/miner";
 import { addToTransactionPool, getTransactionPool, updateTransactionPool } from "../utils/transactionPool";
 import _ from "lodash";
 import { Wallet, createTransaction, getPublickey } from "./wallet";
-import { broadcastLatest } from "../utils/p2p";
+import { broadCastTransactionPool, broadcastLatest } from "../utils/p2p";
 
 // in seconds
 const BLOCK_GENERATION_INTERVAL: number = 10;
@@ -122,7 +122,7 @@ class BlockChain {
         const nextTimestamp: number = getCurrentTimestamp();
         const newBlock: Block = mine(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);
         if (this.addBlockToChain(newBlock)) {
-            // broadcastLatest();
+            broadcastLatest();
             return newBlock;
         } else {
             return null;
@@ -130,7 +130,6 @@ class BlockChain {
     };
 
     generateNextBlock = (address: string) => {
-        // TODO: private key
         const coinbaseTx: Transaction = getCoinbaseTransaction(address, this.getLatestBlock().index + 1);
         const blockData: Transaction[] = [coinbaseTx].concat(getTransactionPool());
         return this.generateRawNextBlock(blockData);
@@ -152,7 +151,7 @@ class BlockChain {
     sendTransaction = (sender: Wallet, recipient: string, amount: number) => {
         const tx: Transaction = createTransaction(recipient, amount, sender.privateKey, this.getUnspentTxOuts(), getTransactionPool());
         addToTransactionPool(tx, this.getUnspentTxOuts());
-        // broadcastTransactionPool();
+        broadCastTransactionPool();
         return tx;
     }
 
