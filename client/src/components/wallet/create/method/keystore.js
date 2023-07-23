@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Form, InputGroup, Row, Col } from 'react-bootstrap';
 import {
@@ -13,10 +13,21 @@ import {
   PiNumberCircleTwoDuotone,
   PiNumberCircleTwoFill,
 } from 'react-icons/pi';
+import { create } from '@mui/material/styles/createTransitions';
+import { createWalletService } from 'api/wallet';
+import { AppContext } from 'Context';
 
 function KeystoreCreate(props) {
+  const contex = useContext(AppContext);
+  const { setAccessStatus, WalletInfo, setWalletInfo } = contex;
   const [step, setStep] = useState(1);
   const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [wallet, setWallet] = useState({ publicKey: '', privateKey: '' });
+  const [dataDonwload, setDataDownload] = useState(null);
+
   const navigate = useNavigate();
   return (
     <Container fluid className="d-flex justify-content-between flex-column">
@@ -92,6 +103,7 @@ function KeystoreCreate(props) {
                 id="password"
                 aria-label="Dollar amount (with dot and two decimal places)"
                 type={showPass ? '' : 'password'}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <InputGroup.Text
                 role="button"
@@ -113,13 +125,14 @@ function KeystoreCreate(props) {
               <Form.Control
                 id="confirm-password"
                 aria-label="Dollar amount (with dot and two decimal places)"
-                type={showPass ? '' : 'password'}
+                type={showConfirmPass ? '' : 'password'}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <InputGroup.Text
                 role="button"
-                onClick={() => setShowPass(!showPass)}
+                onClick={() => setShowConfirmPass(!showConfirmPass)}
               >
-                {showPass ? <AiFillEyeInvisible /> : <AiFillEye />}
+                {showConfirmPass ? <AiFillEyeInvisible /> : <AiFillEye />}
               </InputGroup.Text>
             </InputGroup>
           </Row>
@@ -131,7 +144,23 @@ function KeystoreCreate(props) {
               style={{ width: '30%' }}
               type="submit"
               className="mt-3"
-              onClick={() => setStep(2)}
+              onClick={() => {
+                if (password.length < 8) { alert('Password must be at least 8 characters long'); return; }
+                if (password !== confirmPassword) { alert('Password does not match'); return; }
+                createWalletService('usingPassword', password).then((data) => {
+                  setWallet({
+                    publicKey: data.address,
+                    privateKey: data.privateKey,
+                  });
+                  setDataDownload({
+                    address: data.address,
+                    passhash: data.passhash,
+                    crypted: data.crypted,
+                  });
+                }).catch(err => console.log(err));
+
+                setStep(2);
+              }}
             >
               Create wallet
             </Button>
@@ -161,7 +190,17 @@ function KeystoreCreate(props) {
                 style={{ width: '80%' }}
                 type="submit"
                 className="mt-3"
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  const fileName = `keystore-wallet-${Date.now()}`;
+                  var data = new Blob([JSON.stringify(dataDonwload)], { type: 'text/plain' });
+                  console.log(dataDonwload);
+                  var url = window.URL.createObjectURL(data);
+                  var dowloadTag = document.createElement("a");
+                  dowloadTag.href = url;
+                  dowloadTag.download = fileName;
+                  dowloadTag.click();
+                  setStep(3);
+                }}
               >
                 Acknowledge & download
               </Button>
@@ -177,7 +216,13 @@ function KeystoreCreate(props) {
             style={{ width: '30%' }}
             type="submit"
             className="mt-3 mx-auto"
-            onClick={() => setStep(1)}
+            onClick={() => {
+              setDataDownload(null);
+              setPassword('');
+              setConfirmPassword('');
+              setWallet({ publicKey: '', privateKey: '' });
+              setStep(1);
+            }}
           >
             Create another wallet
           </Button>
@@ -187,7 +232,11 @@ function KeystoreCreate(props) {
             style={{ width: '30%' }}
             type="submit"
             className="mt-3 mx-auto"
-            onClick={() => navigate('/wallet/dashboard')}
+            onClick={() => {
+              setAccessStatus(true);
+              setWalletInfo(wallet);
+              navigate('/wallet/dashboard');
+            }}
           >
             Access wallet
           </Button>

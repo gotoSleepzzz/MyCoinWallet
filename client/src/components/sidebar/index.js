@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Container,
   Row,
@@ -18,8 +18,11 @@ import { BsSend } from 'react-icons/bs';
 import { AiOutlineHistory } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
 import { FaLaptopCode } from 'react-icons/fa'
+import { AppContext } from 'Context';
 
 const Sidebar = () => {
+  const context = useContext(AppContext);
+  const { setAccessStatus, setWalletInfo, WalletInfo } = context;
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
 
@@ -61,7 +64,7 @@ const Sidebar = () => {
                 overflow: 'clip',
                 zIndex: '1',
               }}
-              src="https://mewcard.mewapi.io/?address=0xb389b203801180f5ee112c7f7a6dbc3eec0c445c"
+              src={`https://mewcard.mewapi.io/?address=${WalletInfo.publicKey.slice(0,42)}`}
             />
             <div
               style={{
@@ -77,14 +80,16 @@ const Sidebar = () => {
                 zIndex: '1',
               }}
             >
-              0xb389b203801180f5ee112c7f7a6dbc3eec0c445c
+              {WalletInfo.publicKey}
               <h3 className="mt-3 mb-5" style={{ fontWeight: '700' }}>
                 $0.00
               </h3>
               <Row className="d-flex justify-content-center">
                 <Col>0 ETH</Col>
                 <Col className="d-flex flex-row-reverse">
-                  <MdOutlineContentCopy className='iconAnimation' role="button" />
+                  <MdOutlineContentCopy className='iconAnimation' role="button" onClick={() => {
+                    navigator.clipboard.writeText(WalletInfo.publicKey);
+                  }} />
                 </Col>
               </Row>
             </div>
@@ -142,7 +147,7 @@ const Sidebar = () => {
           </Row>
         </a>
         <hr />
-        <a role='button' onClick={() => navigate('/')} className='sideBarMenu-item'>
+        <a role='button' onClick={() => { setAccessStatus(false); setWalletInfo({}); navigate('/'); }} className='sideBarMenu-item'>
           <Row className='mx-auto my-3'>
             <Col className='col-2'>
               <BiLogOut size={25} />

@@ -30,7 +30,7 @@ function AccessStatus() {
           >
             <Sidebar />
           </div>
-          <div style={{ display: 'flex', flex: '1 0 auto', width: 'calc(100%)-300' }}>
+          <div style={{ display: 'flex', flex: '1 0 auto', maxWidth: 'calc(100%)-300px' }}>
             <Outlet />
           </div>
         </div>

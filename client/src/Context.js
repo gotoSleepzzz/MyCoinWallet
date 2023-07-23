@@ -1,14 +1,16 @@
 import { useState } from "react";
 import React from 'react';
 
-export const AppContext = React.createContext();
+export const AppContext = React.createContext(null);
 export default function Context({ children }) {
-    const [AccessStatus, setAccessStatus] = useState(true);
+    const [AccessStatus, setAccessStatus] = useState(false);
     const [WalletInfo, setWalletInfo] = useState({ publicKey: "", privateKey: "" });
 
     const exportContext = {
         AccessStatus,
-        WalletInfo
+        WalletInfo,
+        setAccessStatus,
+        setWalletInfo
     }
 
 

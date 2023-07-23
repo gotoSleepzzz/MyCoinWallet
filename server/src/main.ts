@@ -171,6 +171,7 @@ app.post('/api/v1/accessWallet', (req, res) => {
     } else if (method === 'usingPrivateKey') {
       wallet = getWallet(req.body.privateKey);
     } else {
+      console.log(method);
       throw new Error('Invalid method');
     }
     OWNER.push(wallet);

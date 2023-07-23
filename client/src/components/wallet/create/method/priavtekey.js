@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
   Button,
-  Col,
   Container,
   Form,
-  FormGroup,
   InputGroup,
   Row,
 } from 'react-bootstrap';
 import { MdOutlineContentCopy } from 'react-icons/md';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { AppContext } from 'Context';
+import { createWalletService } from 'api/wallet';
 
 function PriavtekeyCreate(props) {
+  const contex = useContext(AppContext);
+  const { setAccessStatus, WalletInfo, setWalletInfo } = contex;
+  const [wallet, setWallet] = useState({ publicKey: '', privateKey: '' });
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
+
+  useEffect(() => {
+    createWalletService('usingPrivateKey', '').then((data) => {
+      setWallet({
+        publicKey: data.address,
+        privateKey: data.privateKey,
+      });
+    }).catch(err => console.log(err));
+  }, []);
+
   return (
     <Container fluid className="d-flex justify-content-between flex-column">
       <Row className="justify-content-center">
@@ -39,14 +52,15 @@ function PriavtekeyCreate(props) {
         </Form.Label>
         <InputGroup>
           <Form.Control
-            id="private-key"
+            id="public-key"
             aria-label="Dollar amount (with dot and two decimal places)"
             readOnly
+            value={wallet.publicKey}
           />
           <InputGroup.Text
             role="button"
             onClick={() => {
-              navigator.clipboard.writeText('public key');
+              navigator.clipboard.writeText(wallet.publicKey);
             }}
           >
             <MdOutlineContentCopy />
@@ -68,6 +82,7 @@ function PriavtekeyCreate(props) {
             aria-label="Dollar amount (with dot and two decimal places)"
             type={showPass ? '' : 'password'}
             readOnly
+            value={wallet.privateKey}
           />
           <InputGroup.Text role="button" onClick={() => setShowPass(!showPass)}>
             {showPass ? <AiFillEyeInvisible /> : <AiFillEye />}
@@ -75,7 +90,7 @@ function PriavtekeyCreate(props) {
           <InputGroup.Text
             role="button"
             onClick={() => {
-              navigator.clipboard.writeText('private key');
+              navigator.clipboard.writeText(wallet.privateKey);
             }}
           >
             <MdOutlineContentCopy />
@@ -90,7 +105,11 @@ function PriavtekeyCreate(props) {
           style={{ width: '30%' }}
           type="submit"
           className="mt-3"
-          onClick={() => navigate('/wallet/dashboard')}
+          onClick={() => {
+            setAccessStatus(true);
+            setWalletInfo(wallet);
+            navigate('/wallet/dashboard');
+          }}
         >
           Access wallet
         </Button>

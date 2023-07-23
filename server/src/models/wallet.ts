@@ -62,6 +62,7 @@ const createWalletUsingPassword = (password: string) => {
     wallet.createNew();
     const data = {
         address: wallet.address,
+        privateKey: wallet.privateKey,
         passhash: CryptoJS.SHA256(password).toString(),
         crypted: encryptPK(wallet.privateKey.substring(2, wallet.privateKey.length), password)
     }
@@ -75,6 +76,7 @@ const createWallet = (): Wallet => {
 }
 
 const getWalletFromPassword = (password: string, data: string): Wallet => {
+    console.log(data);
     const dataJS = JSON.parse(data);
     const wallet = new Wallet();
     if (!wallet.loadFromPassword(password, dataJS.address, dataJS.passhash, dataJS.crypted)) throw new Error('Invalid password');

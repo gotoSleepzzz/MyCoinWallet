@@ -1,15 +1,14 @@
+import axios from 'axios';
+import { BASE_URL } from 'constants/const';
 
-class BlockService {
+const getBlocksService = () => {
+    return axios.get(`${BASE_URL}/blocks`)
+        .then(res => res.data)
+        .catch(err => console.log(err))
+}
 
-    const getBlocks = () => {
-        return axios.get(`${apiUrl}/blocks`)
-            .then(res => res.data)
-            .catch(err => console.log(err))
-    }
-
-    const getBlock = (blockHash) => {
-        return axios.get(`${apiUrl}/block/${blockHash}`)
-            .then(res => res.data)
-            .catch(err => console.log(err))
-    }
+const getBlockService = (blockHash) => {
+    return axios.get(`${BASE_URL}/block/${blockHash}`)
+        .then(res => res.data)
+        .catch(err => console.log(err))
 }

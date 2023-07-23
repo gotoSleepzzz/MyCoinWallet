@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { Home, Wallet, Transactions, History } from './pages';
-import React, { Fragment } from 'react';
+import { Home, Transactions, History } from './pages';
+import React from 'react';
 import { WalletAccess } from './components/wallet/access';
 import WalletCreate from './components/wallet/create';
 import AccessStatus from './components/layout/accessStatus';
