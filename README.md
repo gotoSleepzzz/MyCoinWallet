@@ -38,22 +38,22 @@ http://localhost:3000
 
 # TODO:
 - client
-    - done : home
-    - done : create wallet
-    - done : access my wallet
-    - view wallet
-    - send coin
+    - back button for block + transaction
+    - send transaction + animaation
     - view history (https://etherscan.io/)
+    - logout clear client
+    - socket ...
 
 - server
-    - done : create blockchain
-    - done : create transaction
-    - done : create wallet
-    - done : access wallet
-    - done : view history
-    - done : make transaction
+    - view history
     - send transaction
+    - socket with client ...
+
+- PeerNetwork
+    - UI monitor
+
+- common
+    - test data
 
 ### Reference
-- https://github.com/anders94/blockchain-demo
 - https://github.com/lhartikk/naivecoin
