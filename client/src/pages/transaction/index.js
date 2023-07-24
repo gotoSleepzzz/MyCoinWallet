@@ -10,7 +10,7 @@ function Transactions() {
     useEffect(() => {
         getTransactionsService().then((res) => {
             console.log(res);
-            setTransactions(res.transactions);
+            setTransactions(res.transactions.reverse());
         }).catch(err => console.log(err));
     }, []);
     return (

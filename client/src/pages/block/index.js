@@ -8,7 +8,7 @@ function Blocks() {
     const [blocks, setBlocks] = useState([]);
     useEffect(() => {
         getBlocksService().then((res) => {
-            setBlocks([...res.blocks]);
+            setBlocks([...res.blocks.reverse()]);
         }).catch(err => console.log(err));
     }, []);
 

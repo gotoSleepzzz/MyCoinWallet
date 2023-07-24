@@ -1,13 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  Button,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-} from 'react-bootstrap';
+import { Button, Container, Form, InputGroup, Row } from 'react-bootstrap';
 import { MdOutlineContentCopy } from 'react-icons/md';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import { AppContext } from 'Context';
@@ -20,13 +14,20 @@ function PriavtekeyCreate(props) {
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
 
+  const handleCreateWallet = () => {
+    createWalletService('usingPrivateKey', '')
+      .then((data) => {
+        setWallet({
+          publicKey: data.address,
+          privateKey: data.privateKey,
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
-    createWalletService('usingPrivateKey', '').then((data) => {
-      setWallet({
-        publicKey: data.address,
-        privateKey: data.privateKey,
-      });
-    }).catch(err => console.log(err));
+    console.log('create wallet');
+    handleCreateWallet();
   }, []);
 
   return (

@@ -121,6 +121,7 @@ class BlockChain {
         const nextIndex: number = previousBlock.index + 1;
         const nextTimestamp: number = getCurrentTimestamp();
         const newBlock: Block = mine(nextIndex, previousBlock.hash, nextTimestamp, blockData, difficulty);
+        console.log('new block: %s', JSON.stringify(newBlock));
         if (this.addBlockToChain(newBlock)) {
             broadcastLatest();
             return newBlock;
