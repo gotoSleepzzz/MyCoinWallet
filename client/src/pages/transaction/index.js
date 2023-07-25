@@ -3,6 +3,7 @@ import './style.css';
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getTransactionsService } from "api/transaction";
+import moment from 'moment';
 
 function Transactions() {
     const navigate = useNavigate();
@@ -29,12 +30,12 @@ function Transactions() {
                     {
                         transactions.map((transaction, index) => {
                             return (
-                                <tr role="button" onClick={() => navigate(`/transaction/${transaction.hash}`)}>
-                                    <td>{transaction.hash}</td>
-                                    <td>{transaction.timestamp}</td>
-                                    <td>{transaction.from}</td>
-                                    <td>{transaction.to}</td>
-                                    <td>{transaction.amount}</td>
+                                <tr role="button" onClick={() => navigate(`/transaction/${transaction.id}`)}>
+                                    <td>{transaction.id}</td>
+                                    <td>{moment.unix(transaction.txIns[transaction.txIns.length - 1].timestamp).fromNow()}</td>
+                                    <td>{transaction.txIns[transaction.txIns.length - 1].from}</td>
+                                    <td>{transaction.txIns[transaction.txIns.length - 1].to}</td>
+                                    <td>{transaction.txIns[transaction.txIns.length - 1].amount}</td>
                                 </tr>
                             );
                         })

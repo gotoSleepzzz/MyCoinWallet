@@ -13,4 +13,24 @@ const getBlockService = (blockHash) => {
         .catch(err => console.log(err))
 }
 
-export { getBlocksService, getBlockService };
+const mineNextBlockService = (address) => {
+    const promise = axios.post(`${BASE_URL}/mineBlock`, {
+        address: address
+    });
+    const dataPromise = promise.then((res) => res.data);
+    return dataPromise;
+}
+
+const mineTransactionService = (sender, recipient, amount) => {
+    const promise = axios.post(`${BASE_URL}/mineTransaction`, {
+        sender: sender,
+        recipient: recipient,
+        amount: amount,
+    });
+    const dataPromise = promise.then((res) => res.data);
+    return dataPromise;
+}
+
+
+
+export { getBlocksService, getBlockService, mineNextBlockService, mineTransactionService };

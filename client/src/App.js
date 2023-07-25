@@ -9,9 +9,11 @@ import SendTx from 'pages/wallet/sendtx';
 import Blocks from 'pages/block';
 import TransactionWithHash from 'pages/transaction/hash';
 import BlockWithHash from 'pages/block/hash';
+import TransactionPool from 'pages/transactionPool';
+import { BASE_URL } from 'constants/const';
 
 function App() {
-
+console.log(process.env);
   return (
     <div className="App">
       <BrowserRouter>
@@ -29,6 +31,7 @@ function App() {
             <Route path="/transaction/:hash" element={<TransactionWithHash />} />
             <Route path="/block" element={<Blocks />} />
             <Route path="/block/:hash" element={<BlockWithHash />} />
+            <Route path="/transactionpool" element={<TransactionPool />} />
           </Route>
 
         </Routes>

@@ -55,7 +55,7 @@ app.get('/api/v1/block/:hash', (req, res) => {
 
 app.get('/api/v1/transaction', (req, res) => {
   try {
-    const transactions = getTransactionPool();
+    const transactions = blockChain.getTransactions();
     res.status(200).json({ transactions: transactions });
   } catch (e) {
     console.log(e);
@@ -70,6 +70,16 @@ app.get('/api/v1/transaction/:hash', (req, res) => {
       .flatten()
       .find({ 'id': req.params.hash });
     res.status(200).json({ transaction: tx });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.get('/api/v1/transactionPool', (req, res) => {
+  try {
+    const transactions = getTransactionPool();
+    res.status(200).json({ transactions: transactions });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
@@ -250,15 +260,32 @@ app.post('/api/v1/sendTransaction', (req, res) => {
     if (sender === undefined || recipient === undefined || amount === undefined) {
       throw new Error('Invalid parameters');
     }
-    console.log(OWNER);
     const ownWallet = OWNER.find((w) => w.address === sender);
     if (ownWallet === undefined) {
       throw new Error('Invalid sender');
     }
-    const resp = blockChain.sendTransaction(ownWallet, recipient, amount);
+    const resp = blockChain.sendTransaction(ownWallet, recipient, parseInt(amount));
     res.status(200).send(resp);
   } catch (e) {
     console.log(e);
+    res.status(400).send(e);
+  }
+});
+
+app.post('/api/v1/logout', (req, res) => {
+  try {
+    const address = req.body.address;
+    if (address === undefined) {
+      throw new Error('Invalid address');
+    }
+    const idx = OWNER.findIndex((w) => w.address === address);
+    if (idx === -1) {
+      throw new Error('Invalid address');
+    }
+    OWNER.splice(idx, 1);
+    res.status(200).json({ message: 'Success' });
+  } catch (e) {
+    console.log(e); 
     res.status(400).send(e);
   }
 });

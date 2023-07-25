@@ -20,6 +20,7 @@ import { BiLogOut } from 'react-icons/bi';
 import { FaLaptopCode } from 'react-icons/fa'
 import { AppContext } from 'Context';
 import { getBalanceService } from 'api/wallet';
+import {MdDataArray} from 'react-icons/md';
 
 const Sidebar = () => {
   const context = useContext(AppContext);
@@ -31,13 +32,21 @@ const Sidebar = () => {
     setShowMenu(!showMenu);
   };
 
-  useEffect(() => {
+  const loadBalance = () => {
     getBalanceService(WalletInfo.publicKey).then((res) => {
       setWalletInfo({
         ...WalletInfo,
         balance: res.balance,
       });
     }).catch(err => console.log(err));
+  }
+
+  setTimeout(() => {
+    loadBalance();
+  }, 2000);
+
+  useEffect(() => {
+    loadBalance();
   }, []);
 
   return (
@@ -136,6 +145,14 @@ const Sidebar = () => {
               <BiTransferAlt size={25} />
             </Col>
             <Col className='col-9'>Transactions</Col>
+          </Row>
+        </a>
+        <a role='button' onClick={() => navigate('/transactionpool')} className='sideBarMenu-item'>
+          <Row className='mx-auto my-3'>
+            <Col className='col-2'>
+              <MdDataArray size={25} />
+            </Col>
+            <Col className='col-9'>Transaction pool</Col>
           </Row>
         </a>
         <hr />

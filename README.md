@@ -37,18 +37,6 @@ http://localhost:3000
 ```
 
 # TODO:
-- client
-    - back button for block + transaction
-    - send transaction + animaation
-    - view history (https://etherscan.io/)
-    - logout clear client
-    - socket ...
-
-- server
-    - view history
-    - send transaction
-    - socket with client ...
-
 - PeerNetwork
     - UI monitor
 

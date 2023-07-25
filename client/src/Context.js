@@ -6,6 +6,7 @@ export default function Context({ children }) {
     const [AccessStatus, setAccessStatus] = useState(false);
     const [WalletInfo, setWalletInfo] = useState({ publicKey: "", privateKey: "", balance: 0 });
     const [blockchain, setBlockchain] = useState(null);
+    const [autoMine, setAutoMine] = useState(false);
 
     const exportContext = {
         AccessStatus,
@@ -13,7 +14,9 @@ export default function Context({ children }) {
         setAccessStatus,
         setWalletInfo,
         blockchain,
-        setBlockchain
+        setBlockchain, 
+        autoMine,
+        setAutoMine
     }
 
 

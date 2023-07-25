@@ -10,4 +10,10 @@ const getTransactionService = async (transactionHash) => {
     const response = await axios.get(`${BASE_URL}/transaction/${transactionHash}`);
     return response.data;
 }
-export { getTransactionsService, getTransactionService };
+
+const getTransactionPoolService = async () => {
+    const response = await axios.get(`${BASE_URL}/transactionPool`);
+    return response.data;
+}
+
+export { getTransactionsService, getTransactionService, getTransactionPoolService };

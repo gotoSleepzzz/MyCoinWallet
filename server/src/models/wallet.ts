@@ -2,6 +2,7 @@ import { ec } from "elliptic";
 import * as CryptoJS from "crypto-js";
 import { Transaction, TxIn, TxOut, UnspentTxOut } from "./transaction";
 import _ from "lodash";
+import { getCurrentTimestamp } from "../utils/util";
 
 const EC = new ec('secp256k1');
 class Wallet {
@@ -17,6 +18,7 @@ class Wallet {
         const keyPair = this.generateKeyPair();
         this.privateKey = `0x${keyPair.privateKey}`;
         this.address = `0x${keyPair.publicKey}`;
+        console.log("create wallet %s - %s", this.address, getPublickey(this.privateKey));
     }
 
     generateKeyPair(): any {
@@ -47,7 +49,7 @@ class Wallet {
 }
 
 const getPublickey = (privateKey: string): string => {
-    return `0x${EC.keyFromPrivate(privateKey, 'hex').getPublic('hex')}`;
+    return `0x${EC.keyFromPrivate(privateKey.substring(2, privateKey.length), 'hex').getPublic('hex')}`;
 }
 
 const encryptPK = (privateKey: string, password: string): string => {
@@ -67,7 +69,7 @@ const createWalletUsingPassword = (password: string) => {
         crypted: encryptPK(wallet.privateKey.substring(2, wallet.privateKey.length), password),
         balance: wallet.balance,
     }
-    return {data,wallet};
+    return { data, wallet };
 }
 
 const createWallet = (): Wallet => {
@@ -140,29 +142,24 @@ const createTxOuts = (receiverAddress: string, myAddress: string, amount: number
 
 const createTransaction = (receiverAddress: string, amount: number, privateKey: string,
     unspentTxOuts: UnspentTxOut[], txPool: Transaction[]): Transaction => {
-
-    console.log('txPool: %s', JSON.stringify(txPool));
     const myAddress: string = getPublickey(privateKey);
+
     const myUnspentTxOutsA = unspentTxOuts.filter((uTxO: UnspentTxOut) => uTxO.address === myAddress);
 
+    console.log('unspentTxOuts  2: %s', JSON.stringify(myUnspentTxOutsA));
     const myUnspentTxOuts = filterTxPoolTxs(myUnspentTxOutsA, txPool);
 
     // filter from unspentOutputs such inputs that are referenced in pool
     const { includedUnspentTxOuts, leftOverAmount } = findTxOutsForAmount(amount, myUnspentTxOuts);
 
     const toUnsignedTxIn = (unspentTxOut: UnspentTxOut) => {
-        const txIn: TxIn = new TxIn();
-        txIn.txOutId = unspentTxOut.txOutId;
-        txIn.txOutIndex = unspentTxOut.txOutIndex;
+        const txIn: TxIn = new TxIn(unspentTxOut.txOutId, unspentTxOut.txOutIndex, '', myAddress, receiverAddress, amount, getCurrentTimestamp());
         return txIn;
     };
 
     const unsignedTxIns: TxIn[] = includedUnspentTxOuts.map(toUnsignedTxIn);
 
-    const tx: Transaction = new Transaction();
-    tx.txIns = unsignedTxIns;
-    tx.txOuts = createTxOuts(receiverAddress, myAddress, amount, leftOverAmount);
-    tx.id = tx.getTransactionId();
+    const tx: Transaction = new Transaction(unsignedTxIns, createTxOuts(receiverAddress, myAddress, amount, leftOverAmount));
 
     tx.txIns = tx.txIns.map((txIn: TxIn, index: number) => {
         txIn.signature = tx.signTxIn(index, privateKey, unspentTxOuts);

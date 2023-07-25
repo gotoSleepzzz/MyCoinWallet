@@ -19,17 +19,19 @@ class BlockChain {
     public chain: Block[];
     public difficulty: number;
     public unspentTxOuts: UnspentTxOut[];
+    public transactions: Transaction[];
     public io: any;
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
         this.difficulty = 4; // Adjust the difficulty as per your requirements
         this.unspentTxOuts = [];
+        this.transactions = [];
     }
 
     createGenesisBlock(): Block {
         return new Block(
-            0, '89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3', '', 1465154705, [], 0, 0
+            0, '89eb0ac031a63d2421cd05a2fbe41f3ea35f5c3712ca839cbf6b85c4ee07b7a3', '', 1690305747, [], 0, 0
         );
     }
 
@@ -48,6 +50,15 @@ class BlockChain {
     findUnspentTxOuts(address: string) {
         return this.unspentTxOuts.filter((uTxO: UnspentTxOut) => uTxO.address === address);
     };
+
+    addTransaction(txs: Transaction[]) {
+        this.transactions = this.transactions.concat(txs);
+        return this.transactions;
+    }
+
+    getTransactions() {
+        return this.transactions;
+    }
 
     getDifficulty(): number {
         const latestBlock: Block = this.chain[this.chain.length - 1];
@@ -95,7 +106,6 @@ class BlockChain {
 
     // and txPool should be only updated at the same time
     setUnspentTxOuts = (newUnspentTxOut: UnspentTxOut[]) => {
-        console.log('replacing unspentTxouts with: %s', newUnspentTxOut);
         this.unspentTxOuts = newUnspentTxOut;
     };
 
@@ -131,6 +141,7 @@ class BlockChain {
     };
 
     generateNextBlock = (address: string) => {
+        this.addTransaction(getTransactionPool());
         const coinbaseTx: Transaction = getCoinbaseTransaction(address, this.getLatestBlock().index + 1);
         const blockData: Transaction[] = [coinbaseTx].concat(getTransactionPool());
         return this.generateRawNextBlock(blockData);
@@ -143,6 +154,8 @@ class BlockChain {
         if (typeof amount !== 'number') {
             throw Error('invalid amount');
         }
+
+        this.addTransaction(getTransactionPool());
         const coinbaseTx: Transaction = getCoinbaseTransaction(sender.address, this.getLatestBlock().index + 1);
         const tx: Transaction = createTransaction(recipientAddress, amount, sender.privateKey, this.getUnspentTxOuts(), getTransactionPool());
         const blockData: Transaction[] = [coinbaseTx, tx];

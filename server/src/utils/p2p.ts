@@ -4,7 +4,7 @@ import { BlockChain } from '../models/blockchain';
 import { getTransactionPool } from './transactionPool';
 import { Block } from '../models/block';
 import { JSONToObject } from './util';
-import { Transaction } from '../models/transaction';
+import { Transaction, TxIn, TxOut } from '../models/transaction';
 
 const peers: Array<string> = [];
 
@@ -73,6 +73,12 @@ const addPeer = (peer: string) => {
                     }
                     receivedTransactions.forEach((transaction: Transaction) => {
                         try {
+                            const txIns = transaction.txIns.map(
+                                (txIn) => new TxIn(txIn.txOutId, txIn.txOutIndex, txIn.signature, txIn.from, txIn.to, txIn.amount, txIn.timestamp)
+                            );
+                            const txOuts = transaction.txOuts.map((txOut) => new TxOut(txOut.address, txOut.amount));
+
+                            const tx = new Transaction(txIns, txOuts);
                             blockChain.handleReceivedTransaction(transaction);
                             // if no error is thrown, transaction was indeed added to the pool
                             // let's broadcast transaction pool

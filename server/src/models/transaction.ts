@@ -25,6 +25,20 @@ class TxIn {
     public txOutId: string;
     public txOutIndex: number;
     public signature: string;
+    public from: string;
+    public to: string;
+    public amount: number;
+    public timestamp: number;
+
+    constructor(txOutId: string, txOutIndex: number, signature: string, from: string, to: string, amount: number, timestamp: number) {
+        this.txOutId = txOutId;
+        this.txOutIndex = txOutIndex;
+        this.signature = signature;
+        this.from = from;
+        this.to = to;
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
 }
 
 class TxOut {
@@ -41,6 +55,12 @@ class Transaction {
     public id: string;
     public txIns: TxIn[];
     public txOuts: TxOut[];
+
+    constructor(txIns: TxIn[], txOuts: TxOut[]) {
+        this.txIns = txIns;
+        this.txOuts = txOuts;
+        this.id = this.getTransactionId();
+    }
 
     getTransactionId = (): string => {
         const txInContent: string = this.txIns
@@ -95,7 +115,8 @@ class Transaction {
                 ' key that does not match the address that is referenced in txIn');
             throw Error();
         }
-        const key = ec.keyFromPrivate(privateKey, 'hex');
+        const prKey = privateKey.startsWith('0x') ? privateKey.substring(2, privateKey.length) : privateKey;
+        const key = ec.keyFromPrivate(prKey, 'hex');
         const signature: string = key.sign(dataToSign).toDER('hex');
 
         return signature;
@@ -222,6 +243,7 @@ const isValidTxInStructure = (txIn: TxIn): boolean => {
 };
 
 const isValidTxOutStructure = (txOut: TxOut): boolean => {
+    console.log(txOut);
     if (txOut == null) {
         console.log('txOut is null');
         return false;
@@ -269,14 +291,13 @@ const isValidTransactionStructure = (transaction: Transaction) => {
 
 // valid address is a valid ecdsa public key in the 04 + X-coordinate + Y-coordinate format
 const isValidAddress = (address: string): boolean => {
-    if (address.length !== 130) {
-        console.log(address);
+    if (address.length !== 132) {
         console.log('invalid public key length');
         return false;
-    } else if (address.match('^[a-fA-F0-9]+$') === null) {
+    } else if (address.substring(2, address.length).match('^[a-fA-F0-9]+$') === null) {
         console.log('public key must contain only hex characters');
         return false;
-    } else if (!address.startsWith('04')) {
+    } else if (!address.startsWith('04', 2)) {
         console.log('public key must start with 04');
         return false;
     }
@@ -291,7 +312,7 @@ const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: Unsp
     }
     const address = referencedUTxOut.address;
 
-    const key = ec.keyFromPublic(address, 'hex');
+    const key = ec.keyFromPublic(address.substring(2, address.length), 'hex');
     const validSignature: boolean = key.verify(transaction.id, txIn.signature);
     if (!validSignature) {
         console.log('invalid txIn signature: %s txId: %s address: %s', txIn.signature, transaction.id, referencedUTxOut.address);
@@ -309,15 +330,12 @@ const findUnspentTxOut = (transactionId: string, index: number, aUnspentTxOuts: 
 };
 
 const getCoinbaseTransaction = (address: string, blockIndex: number): Transaction => {
-    const t = new Transaction();
-    const txIn: TxIn = new TxIn();
+    const txIn: TxIn = new TxIn('', blockIndex, '', '', '', 0, 0);
     txIn.signature = '';
     txIn.txOutId = '';
     txIn.txOutIndex = blockIndex;
 
-    t.txIns = [txIn];
-    t.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
-    t.id = t.getTransactionId();
+    const t = new Transaction([txIn], [new TxOut(address, COINBASE_AMOUNT)]);
     return t;
 };
 

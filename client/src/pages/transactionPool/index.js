@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { getTransactionPoolService } from "api/transaction";
 import moment from 'moment';
 
-function History() {
+function TransactionPool() {
     const navigate = useNavigate();
-    const [history, setHistory] = useState([]); // [
+    const [pool, setPool] = useState([]); // [
     useEffect(() => {
-
+        getTransactionPoolService().then((res) => {
+            console.log(res);
+        }).catch(err => console.log(err));
     }, []);
     return (
         <Container fluid className='d-flex pt-5 justify-content-around' style={{ overflowX: 'auto', overflowY: 'scroll' }}>
@@ -24,7 +26,7 @@ function History() {
                 </thead>
                 <tbody>
                     {
-                        history.map((transaction, index) => {
+                        pool.map((transaction, index) => {
                             return (
                                 <tr role="button" onClick={() => navigate(`/transaction/${transaction.id}`)}>
                                     <td>{transaction.id}</td>
@@ -42,4 +44,4 @@ function History() {
     );
 }
 
-export default History;
+export default TransactionPool;

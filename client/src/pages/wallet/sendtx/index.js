@@ -8,14 +8,24 @@ function SendTx() {
   const { WalletInfo } = context;
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
+  const [txIns, setTxIns] = useState([]);
+  const [isSending, setIsSending] = useState(false);
   const handleSendTx = () => {
     if (recipient === '' || amount === '') {
       alert('Please fill in all fields');
       return;
     }
     sendTransactionService(WalletInfo.publicKey, recipient, amount).then(res => {
-      console.log(res);
+      setIsSending(true);
+      setTimeout(() => {
+        setIsSending(false);
+      }, 2000);
+      setTxIns(res.txIns);
     }).catch(err => {
+      setIsSending(true);
+      setTimeout(() => {
+        setIsSending(false);
+      }, 2000);
       console.log(err);
     });
   }
@@ -60,6 +70,18 @@ function SendTx() {
           Send
         </Button>
       </Row>
+
+      {
+        isSending ? (
+          txIns.length > 0 ? (
+            <Row className="justify-content-center mt-2">
+              <h3 className="text-center text-success">Sending success!</h3>
+            </Row>) : (
+            <Row className="justify-content-center mt-2">
+              <h3 className="text-center text-danger">Transaction failed!</h3>
+            </Row>)
+        ) : null
+      }
     </Container>
   )
 }
