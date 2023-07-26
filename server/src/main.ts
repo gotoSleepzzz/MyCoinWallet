@@ -107,9 +107,6 @@ app.post('/api/v1/createWallet', (req, res) => {
     }
     else if (method === 'usingPrivateKey') {
       const wallet = createWallet();
-      // to test demo
-      const block = blockChain.generateNextBlock(wallet.address);
-      //
       OWNER.push(wallet);
       res.status(200).json(wallet);
     }
@@ -223,8 +220,8 @@ app.get('/api/v1/history', (req, res) => {
     if (address === undefined) {
       throw new Error('Invalid address');
     }
-    // const history = blockChain.getTransactionFromWallet(address as string);
-    // res.status(200).json({ history: history });
+    const history = blockChain.getHistory(address as string);
+    res.status(200).json({ history: history });
   } catch (e) {
     console.log(e);
     res.status(400).send(e);

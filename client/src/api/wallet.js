@@ -32,6 +32,9 @@ const sendTransactionService = async (sender, recipient, amount) => {
 }
 
 const getHistoryService = async (address) => {
+    const promise = axios.get(`${BASE_URL}/history?address=${address}`);
+    const dataPromise = promise.then((res) => res.data);
+    return dataPromise;
 }
 
 const getBalanceService = async (address) => {

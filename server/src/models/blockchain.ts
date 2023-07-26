@@ -19,14 +19,12 @@ class BlockChain {
     public chain: Block[];
     public difficulty: number;
     public unspentTxOuts: UnspentTxOut[];
-    public transactions: Transaction[];
     public io: any;
 
     constructor() {
         this.chain = [this.createGenesisBlock()];
         this.difficulty = 4; // Adjust the difficulty as per your requirements
         this.unspentTxOuts = [];
-        this.transactions = [];
     }
 
     createGenesisBlock(): Block {
@@ -51,13 +49,27 @@ class BlockChain {
         return this.unspentTxOuts.filter((uTxO: UnspentTxOut) => uTxO.address === address);
     };
 
-    addTransaction(txs: Transaction[]) {
-        this.transactions = this.transactions.concat(txs);
-        return this.transactions;
+    getTransactions() {
+        const transactions = []
+        for (const block of this.chain) {
+            for (const transaction of block.data) {
+                if (transaction.txIns.length > 0 && transaction.txOuts.length > 0) {
+                    transactions.push(transaction);
+                }
+            }
+        }
+        return transactions;
     }
 
-    getTransactions() {
-        return this.transactions;
+    getHistory(address: string) {
+        const transactions = this.getTransactions();
+        const history = [];
+        for (const transaction of transactions) {
+            if (transaction.txOuts[0].address === address || transaction.txIns[0].from === address || transaction.txIns[0].to === address) {
+                history.push(transaction);
+            }
+        }
+        return history;
     }
 
     getDifficulty(): number {
@@ -141,7 +153,6 @@ class BlockChain {
     };
 
     generateNextBlock = (address: string) => {
-        this.addTransaction(getTransactionPool());
         const coinbaseTx: Transaction = getCoinbaseTransaction(address, this.getLatestBlock().index + 1);
         const blockData: Transaction[] = [coinbaseTx].concat(getTransactionPool());
         return this.generateRawNextBlock(blockData);
@@ -155,7 +166,6 @@ class BlockChain {
             throw Error('invalid amount');
         }
 
-        this.addTransaction(getTransactionPool());
         const coinbaseTx: Transaction = getCoinbaseTransaction(sender.address, this.getLatestBlock().index + 1);
         const tx: Transaction = createTransaction(recipientAddress, amount, sender.privateKey, this.getUnspentTxOuts(), getTransactionPool());
         const blockData: Transaction[] = [coinbaseTx, tx];

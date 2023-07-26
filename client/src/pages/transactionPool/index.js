@@ -7,10 +7,20 @@ import moment from 'moment';
 function TransactionPool() {
     const navigate = useNavigate();
     const [pool, setPool] = useState([]); // [
-    useEffect(() => {
+
+    const loadPool = () => {
         getTransactionPoolService().then((res) => {
-            console.log(res);
+            setPool(res.transactions.reverse());
         }).catch(err => console.log(err));
+    }
+
+    setTimeout(() => {
+        loadPool();
+    }, 1500);
+
+
+    useEffect(() => {
+        loadPool();
     }, []);
     return (
         <Container fluid className='d-flex pt-5 justify-content-around' style={{ overflowX: 'auto', overflowY: 'scroll' }}>

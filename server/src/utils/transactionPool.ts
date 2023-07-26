@@ -52,6 +52,8 @@ const getTxPoolIns = (aTransactionPool: Transaction[]): TxIn[] => {
 
 const isValidTxForPool = (tx: Transaction, aTtransactionPool: Transaction[]): boolean => {
     const txPoolIns: TxIn[] = getTxPoolIns(aTtransactionPool);
+    console.log('txPoolIns: %s', JSON.stringify(txPoolIns));
+    console.log(aTtransactionPool);
 
     const containsTxIn = (txIns: TxIn[], txIn: TxIn) => {
         return _.find(txPoolIns, ((txPoolIn) => {

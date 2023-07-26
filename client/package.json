@@ -28,8 +28,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:dev1": "set REACT_APP_SERVER_URL='http://localhost:8080' PORT=3000 && react-scripts start",
-    "start:dev2": "set REACT_APP_SERVER_URL='http://localhost:8085' PORT=3005 && react-scripts start",
+    "start:dev1": "set REACT_APP_SERVER_URL=http://localhost:8080&& set PORT=3000 && react-scripts start",
+    "start:dev2": "set REACT_APP_SERVER_URL=http://localhost:8085&& set PORT=3005 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
