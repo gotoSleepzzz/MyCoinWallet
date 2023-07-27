@@ -12,20 +12,20 @@ npm run start
 ```
 cd server
 npm install
-npm run start:dev1
-npm run start:dev2
+npm run start:dev1 // using port 8080
+npm run start:dev2 // using port 8085
 ```
 
 ## 3. Run client
 ```
 cd client
 npm install
-npm run start
+npm run start // connect to 8080
+or
+npm run start:dev1 // run port 3000 and connect to server 8080
+npm run start:dev2 // run port 3005 and connect to server 8085
 ```
-Point a web at the demo:
-```
-http://localhost:3000
-```
+
 ## 4. Test
 ```
 
